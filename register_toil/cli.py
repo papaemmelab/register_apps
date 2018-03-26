@@ -16,14 +16,14 @@ Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
 
 from pathlib import Path
-import subprocess
 import os
+import shutil
+import subprocess
 
 import click
 
 from register_toil import __version__
 from register_toil import utils
-
 
 BIN = os.getenv("TOIL_REGISTER_BIN", "/ifs/work/leukgen/local/bin")
 OPT = os.getenv("TOIL_REGISTER_OPT", "/ifs/work/leukgen/local/opt")
@@ -32,47 +32,54 @@ OPT = os.getenv("TOIL_REGISTER_OPT", "/ifs/work/leukgen/local/opt")
 @click.command()
 @click.option(
     "--pypi_name",
+    show_default=True,
     required=True,
-    help="Package name in PyPi.")
+    help="package name in PyPi")
 @click.option(
     "--pypi_version",
+    show_default=True,
     required=True,
-    help="Package version in PyPi.")
+    help="package version in PyPi")
 @click.option(
     "--image_url",
     default=None,
-    help="Docker image URL. default=leukgen/{pypi_name}:{pypi_version}")
+    help="docker image URL [default=leukgen/{pypi_name}:{pypi_version}]")
 @click.option(
     "--bindir",
+    show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
-    help="Path were executables will be linked to.",
+    help="path were executables will be linked to",
     default=BIN)
 @click.option(
     "--optdir",
+    show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
-    help="Path were images will be versioned and cached.",
+    help="path were images will be versioned and cached",
     default=OPT)
 @click.option(
     "--python",
-    help="Which python to be used for the virtual environment.",
+    show_default=True,
+    help="which python to be used for the virtual environment",
     default="python2")
 @click.option(
     "--tmpvar",
-    help="Environment variable used for workdir: --workDir ${tmpvar}.",
+    show_default=True,
+    help="environment variable used for workdir: --workDir ${tmpvar}",
     default="$TMP_DIR")
 @click.option(
     "--volumes",
     type=(click.Path(exists=True, resolve_path=True, dir_okay=True), str),
     multiple=True,
-    required=True,
-    help="List of volumes tuples to be passed to the toil application.")
+    default=[("/ifs", "/ifs")],
+    help="list of volumes tuples to be passed to the toil application "
+    "[default: /ifs /ifs]")
 @click.version_option(version=__version__)
 def main(
         pypi_name, pypi_version, bindir, optdir,
         python, volumes, tmpvar, image_url):
-    """Echo message and exit."""
-    virtualenvwrapper = utils.which("virtualenvwrapper.sh")
-    python = utils.which(python)
+    """Register versioned toil container pipelines in a bin directory."""
+    virtualenvwrapper = shutil.which("virtualenvwrapper.sh")
+    python = shutil.which(python)
     optdir = Path(optdir) / pypi_name / pypi_version
     bindir = Path(bindir)
     optexe = optdir / pypi_name
@@ -104,7 +111,7 @@ def main(
     if not image_url:
         image_url = f"docker://leukgen/{pypi_name}:{pypi_version}"
 
-    singularity = utils.which("singularity")
+    singularity = shutil.which("singularity")
     click.echo("Pulling image...")
     subprocess.check_call([
         "/bin/bash", "-c", f"umask 22 && {singularity} pull {image_url}"

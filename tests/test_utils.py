@@ -3,19 +3,8 @@
 from os.path import join
 import os
 import tarfile
-import subprocess
 
 from register_toil import utils
-
-
-def test_which_util():
-    """Test to check the which util is working."""
-    std_out = subprocess.check_output(
-        [utils.which("python"), "--version"],
-        stderr=subprocess.STDOUT
-        )
-
-    assert "Python" in std_out.decode()
 
 
 def test_force_symlink(tmpdir):
