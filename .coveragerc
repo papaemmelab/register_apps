@@ -1,0 +1,16 @@
+[paths]
+source =
+   register_toil
+   */register_toil
+
+[run]
+source =
+    register_toil
+
+omit =
+    *register_toil/__main__.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:

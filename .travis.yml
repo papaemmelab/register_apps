@@ -1,0 +1,28 @@
+language: python
+
+python:
+  - 3.6
+
+services:
+  - docker
+
+install:
+  - pip install -U codecov
+
+script:
+  - bash test-container.sh
+
+after_success:
+  - codecov
+
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: leukgen
+  password:
+    secure: dvX5y3axynBHnqHBCe6YfnF6oS/l9u+ouWZHA4YiL9A3iCDeQhxxiRAD/GPSeVdufaZa1SGXk2H9PQY17rZm1aoOeXRDKvL/rwNtS3Wzc4ToZXUhkvS+inIg4mefahYhP7opJ8tj+JSx+SKAK7Qm6Kla/2lPhBjPYfyvKgptGxXwURsz/yLeHTVKaQtIha2evucV50TT3dxkZSUmDxw13jE5MpUck/dnCXK+hFqFUs6XjmuLmGWnm1XTNx6TOQefJzwWxGSxzwMN1NrepcnpNcIME7J+TeVUVLNw/TrVf9hcEQYfjjCM+DAhuc6Xu3U0Kc4I4yLsPvrukYw3SQz+mZnxJREQGMiVkv+V+UQMl5GuIMAiARVuSaqmi5lL5lhhLZ0SmFR03wLX4agdLb0fSDjXbse9wJ1Z/ATtqT6KXBw/v/gp6tbb/kSJaQcmygHLJ1PUxwVIUprXdtIIEC1j7gypeBlnFJSl1y5HDLGRrey19Ad2/h3xFYo/Oi8H+ovq3BhW5ZnwvXVYU9nSWTMzlr37wSSFKpGqy3h4Y4f+P+kmWCWhOF6FPFRuXlfcEy3rXni7QeuhbfKnIQK1AhHJbVJkQjHbSZ1s4aKQVGdxz8I+uUERkBwfw0B15tL5x5if3DxLoXRi/G4LcM3V1bCxiHC6cbWmMkmWZGqM0AFNjOI=
+  on:
+    tags: true
+    repo: leukgen/register_toil
+    python: 3.6
+    branch: master
