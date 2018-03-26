@@ -1,0 +1,42 @@
+{
+    "classifiers": [
+        "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
+        "Operating System :: Unix",
+        "Operating System :: POSIX",
+        "Programming Language :: Python :: 2 :: Only",
+        "Topic :: Utilities"
+    ],
+    "entry_points": {
+        "console_scripts": [
+            "register_toil=register_toil.cli:main"
+        ]
+    },
+    "setup_requires": [
+        "pytest-runner==2.11.1"
+    ],
+    "install_requires": [
+        "Click>=6.7",
+        "virtualenvwrapper==4.8.2"
+    ],
+    "extras_require": {
+        "test": [
+            "coverage>=4.4.2",
+            "pydocstyle>=2.1.1",
+            "pytest-cov>=2.5.1",
+            "pytest-env==0.6.2",
+            "pylint>=1.8.1",
+            "tox==2.9.1"
+        ]
+    },
+    "author": "Juan S. Medina",
+    "keywords": [],
+    "license": "BSD",
+    "name": "register_toil",
+    "test_suite": "tests",
+    "long_description": "📘 learn more on `GitHub <https://github.com/leukgen/register_toil>`_!",
+    "description": "® Simple utility to register versioned toil container pipelines in a bin directory.",
+    "url": "https://github.com/leukgen/register_toil"
+}
