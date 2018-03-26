@@ -6,13 +6,15 @@
 [![docker badge][docker_badge]][docker_base]
 [![docker badge][automated_badge]][docker_base]
 
-👾 &nbsp; Simple utility to register versioned [toil container] pipelines in a `bin` directory.
+👾 Simple utility to register versioned [toil container] pipelines in a `bin` directory.
 
 ## Installation
 
 This package is available at [PyPi][pypi_base]:
 
     pip install register_toil
+
+⚠️ **WARNING:** This package only works with singularity 2.4+
 
 ## Usage
 

@@ -37,6 +37,6 @@
     "name": "register_toil",
     "test_suite": "tests",
     "long_description": "📘 learn more on `GitHub <https://github.com/leukgen/register_toil>`_!",
-    "description": "® Simple utility to register versioned toil container pipelines in a bin directory.",
+    "description": "👾 Simple utility to register versioned toil container pipelines in a bin directory.",
     "url": "https://github.com/leukgen/register_toil"
 }
