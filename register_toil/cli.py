@@ -117,11 +117,15 @@ def main(
         "/bin/bash", "-c", f"umask 22 && {singularity} pull {image_url}"
         ], cwd=optdir)
 
+    # fix singularity permissions
+    singularity_image = next(optdir.glob("*.simg"))
+    singularity_image.chmod(mode=0o755)
+
     command = [
         toolpath,
-        "--singularity", str(next(optdir.glob("*.simg"))),
+        "--singularity", str(singularity_image),
         " ".join(f"--volumes {i} {j}" for i, j in volumes),
-        "--workDir", tmpvar, "$@\n"
+        "--workDir", tmpvar, '"$@"\n'
         ]
 
     # link executables
