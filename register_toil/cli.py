@@ -27,6 +27,11 @@ from register_toil import utils
 
 BIN = os.getenv("TOIL_REGISTER_BIN", "/ifs/work/leukgen/local/bin")
 OPT = os.getenv("TOIL_REGISTER_OPT", "/ifs/work/leukgen/local/opt")
+VOLUMES = [
+    ("/ifs", "/ifs"),
+    ("/juno", "/juno"),
+    ("/work", "/work"),
+    ("/res", "/res")]
 
 
 @click.command()
@@ -70,9 +75,9 @@ OPT = os.getenv("TOIL_REGISTER_OPT", "/ifs/work/leukgen/local/opt")
     "--volumes",
     type=(click.Path(exists=True, resolve_path=True, dir_okay=True), str),
     multiple=True,
-    default=[("/ifs", "/ifs")],
-    help="list of volumes tuples to be passed to the toil application "
-    "[default: /ifs /ifs]")
+    default=VOLUMES,
+    show_default=True,
+    help="list of volumes tuples to be passed to the toil application")
 @click.version_option(version=__version__)
 def main(
         pypi_name, pypi_version, bindir, optdir,
@@ -95,13 +100,11 @@ def main(
     click.echo(f"Creating virtual environment '{env}'...")
     subprocess.check_output([
         "/bin/bash", "-c",
-        f"source {virtualenvwrapper} && mkvirtualenv -p {python} {env}"
-        ])
+        f"source {virtualenvwrapper} && mkvirtualenv -p {python} {env}"])
 
     install_cmd = (
         f"source {virtualenvwrapper} && workon {env} && "
-        f"pip install {pypi_name}=={pypi_version} && which {pypi_name}"
-        )
+        f"pip install {pypi_name}=={pypi_version} && which {pypi_name}")
 
     click.echo(f"Installing package with '{install_cmd}'...")
     toolpath = subprocess.check_output(["/bin/bash", "-c", install_cmd])
@@ -125,8 +128,12 @@ def main(
         toolpath,
         "--singularity", str(singularity_image),
         " ".join(f"--volumes {i} {j}" for i, j in volumes),
+<<<<<<< HEAD
         "--workDir", tmpvar, '"$@"\n'
         ]
+=======
+        "--workDir", tmpvar, "$@\n"]
+>>>>>>> 🚀 juno updates
 
     # link executables
     click.echo("Creating and linking executable...")
