@@ -128,12 +128,7 @@ def main(
         toolpath,
         "--singularity", str(singularity_image),
         " ".join(f"--volumes {i} {j}" for i, j in volumes),
-<<<<<<< HEAD
-        "--workDir", tmpvar, '"$@"\n'
-        ]
-=======
         "--workDir", tmpvar, "$@\n"]
->>>>>>> 🚀 juno updates
 
     # link executables
     click.echo("Creating and linking executable...")
