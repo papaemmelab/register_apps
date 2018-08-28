@@ -96,7 +96,7 @@ def main(
     bindir.mkdir(exist_ok=True, parents=True)
 
     # create virtual environment and install package
-    env = f"prod__{pypi_name}__{pypi_version}"
+    env = f"production__{pypi_name}__{pypi_version}"
     click.echo(f"Creating virtual environment '{env}'...")
     subprocess.check_output([
         "/bin/bash", "-c",
