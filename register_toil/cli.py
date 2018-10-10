@@ -25,63 +25,76 @@ import click
 from register_toil import __version__
 from register_toil import utils
 
-BIN = os.getenv("TOIL_REGISTER_BIN", "/ifs/work/leukgen/local/bin")
-OPT = os.getenv("TOIL_REGISTER_OPT", "/ifs/work/leukgen/local/opt")
-VOLUMES = [
-    ("/ifs", "/ifs"),
-    ("/juno", "/juno"),
-    ("/work", "/work"),
-    ("/res", "/res")]
-
 
 @click.command()
 @click.option(
-    "--pypi_name",
-    show_default=True,
-    required=True,
-    help="package name in PyPi")
+    "--pypi_name", show_default=True, required=True, help="package name in PyPi"
+)
 @click.option(
-    "--pypi_version",
-    show_default=True,
-    required=True,
-    help="package version in PyPi")
+    "--pypi_version", show_default=True, required=True, help="package version in PyPi"
+)
 @click.option(
     "--image_url",
     default=None,
-    help="docker image URL [default=leukgen/{pypi_name}:{pypi_version}]")
+    help="docker image URL [default=leukgen/{pypi_name}:{pypi_version}]",
+)
 @click.option(
     "--bindir",
     show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
     help="path were executables will be linked to",
-    default=BIN)
+    default=os.getenv("TOIL_REGISTER_BIN", "/work/isabl/local/bin"),
+)
 @click.option(
     "--optdir",
     show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
     help="path were images will be versioned and cached",
-    default=OPT)
+    default=os.getenv("TOIL_REGISTER_OPT", "/work/isabl/local/opt"),
+)
 @click.option(
     "--python",
     show_default=True,
     help="which python to be used for the virtual environment",
-    default="python2")
+    default="python2",
+)
 @click.option(
     "--tmpvar",
     show_default=True,
     help="environment variable used for workdir: --workDir ${tmpvar}",
-    default="$TMP_DIR")
+    default="$TMP_DIR",
+)
 @click.option(
     "--volumes",
     type=(click.Path(exists=True, resolve_path=True, dir_okay=True), str),
     multiple=True,
-    default=VOLUMES,
+    default=[
+        ("/ifs", "/ifs"),
+        ("/juno", "/juno"),
+        ("/work", "/work"),
+        ("/res", "/res"),
+    ],
     show_default=True,
-    help="list of volumes tuples to be passed to the toil application")
+    help="list of volumes tuples to be passed to the toil application",
+)
+@click.option(
+    "--singularity",
+    show_default=True,
+    help="path to singularity",
+    default="singularity",
+)
 @click.version_option(version=__version__)
 def main(
-        pypi_name, pypi_version, bindir, optdir,
-        python, volumes, tmpvar, image_url):
+    pypi_name,
+    pypi_version,
+    bindir,
+    optdir,
+    python,
+    volumes,
+    tmpvar,
+    image_url,
+    singularity,
+):
     """Register versioned toil container pipelines in a bin directory."""
     virtualenvwrapper = shutil.which("virtualenvwrapper.sh")
     python = shutil.which(python)
@@ -98,13 +111,18 @@ def main(
     # create virtual environment and install package
     env = f"production__{pypi_name}__{pypi_version}"
     click.echo(f"Creating virtual environment '{env}'...")
-    subprocess.check_output([
-        "/bin/bash", "-c",
-        f"source {virtualenvwrapper} && mkvirtualenv -p {python} {env}"])
+    subprocess.check_output(
+        [
+            "/bin/bash",
+            "-c",
+            f"source {virtualenvwrapper} && mkvirtualenv -p {python} {env}",
+        ]
+    )
 
     install_cmd = (
         f"source {virtualenvwrapper} && workon {env} && "
-        f"pip install {pypi_name}=={pypi_version} && which {pypi_name}")
+        f"pip install {pypi_name}=={pypi_version} && which {pypi_name}"
+    )
 
     click.echo(f"Installing package with '{install_cmd}'...")
     toolpath = subprocess.check_output(["/bin/bash", "-c", install_cmd])
@@ -114,21 +132,23 @@ def main(
     if not image_url:
         image_url = f"docker://leukgen/{pypi_name}:{pypi_version}"
 
-    singularity = shutil.which("singularity")
     click.echo("Pulling image...")
-    subprocess.check_call([
-        "/bin/bash", "-c", f"umask 22 && {singularity} pull {image_url}"
-        ], cwd=optdir)
+    subprocess.check_call(
+        ["/bin/bash", "-c", f"umask 22 && {singularity} pull {image_url}"], cwd=optdir
+    )
 
     # fix singularity permissions
     singularity_image = next(optdir.glob("*.simg"))
     singularity_image.chmod(mode=0o755)
-
     command = [
         toolpath,
-        "--singularity", str(singularity_image),
+        "--singularity",
+        str(singularity_image),
         " ".join(f"--volumes {i} {j}" for i, j in volumes),
-        "--workDir", tmpvar, "$@\n"]
+        "--workDir",
+        tmpvar,
+        "$@\n",
+    ]
 
     # link executables
     click.echo("Creating and linking executable...")
@@ -141,4 +161,5 @@ def main(
         f"\n\t{str(optexe)}"
         f"\n\t{str(binexe)}"
         f"\n\t{str(binexe_versioned)}\n",
-        fg="green")
+        fg="green",
+    )

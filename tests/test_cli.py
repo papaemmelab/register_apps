@@ -19,13 +19,20 @@ def test_main(tmpdir):
     binexe_versioned = bindir.join("toil_disambiguate_v0.1.2")
 
     params = [
-        "--pypi_name", "toil_disambiguate",
-        "--pypi_version", "v0.1.2",
-        "--volumes", "/tmp", "/carlos",
-        "--optdir", optdir.strpath,
-        "--bindir", bindir.strpath,
-        "--tmpvar", "$TMP"
-        ]
+        "--pypi_name",
+        "toil_disambiguate",
+        "--pypi_version",
+        "v0.1.2",
+        "--volumes",
+        "/tmp",
+        "/carlos",
+        "--optdir",
+        optdir.strpath,
+        "--bindir",
+        bindir.strpath,
+        "--tmpvar",
+        "$TMP",
+    ]
 
     result = runner.invoke(cli.main, params)
 
@@ -34,10 +41,8 @@ def test_main(tmpdir):
 
     for i in optexe.strpath, binexe.strpath, binexe_versioned.strpath:
         assert b"0.1.2" in subprocess.check_output(
-            args=[i, "--version"],
-            env={"TMP": "/tmp"},
-            stderr=subprocess.STDOUT,
-            )
+            args=[i, "--version"], env={"TMP": "/tmp"}, stderr=subprocess.STDOUT
+        )
 
     assert "--volumes /tmp /carlos" in optexe.read()
     assert "--workDir $TMP" in optexe.read()

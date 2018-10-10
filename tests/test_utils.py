@@ -74,7 +74,7 @@ def test_tar_dir(tmpdir):
         (join(source_dir, "1"), "first file."),
         (join(source_dir, "2"), "second file."),
         (join(source_dir, "3"), "third file."),
-        )
+    )
 
     os.makedirs(source_dir)
     os.makedirs(dst_dir)
