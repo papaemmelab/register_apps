@@ -15,8 +15,7 @@ def test_main(tmpdir):
     optdir = tmpdir.mkdir("opt")
     bindir = tmpdir.mkdir("bin")
     optexe = optdir.join("toil_disambiguate", "v0.1.2", "toil_disambiguate")
-    binexe = bindir.join("toil_disambiguate")
-    binexe_versioned = bindir.join("toil_disambiguate_v0.1.2")
+    binexe = bindir.join("toil_disambiguate_v0.1.2")
 
     params = [
         "--pypi_name",
@@ -39,7 +38,7 @@ def test_main(tmpdir):
     if result.exit_code:
         print(vars(result))
 
-    for i in optexe.strpath, binexe.strpath, binexe_versioned.strpath:
+    for i in optexe.strpath, binexe.strpath:
         assert b"0.1.2" in subprocess.check_output(
             args=[i, "--version"], env={"TMP": "/tmp"}, stderr=subprocess.STDOUT
         )
