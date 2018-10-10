@@ -25,6 +25,13 @@ import click
 from register_toil import __version__
 from register_toil import utils
 
+_DEFAULT_VOLUMES = [
+    ("/ifs", "/ifs"),
+    ("/juno", "/juno"),
+    ("/work", "/work"),
+    ("/res", "/res"),
+]
+
 
 @click.command()
 @click.option(
@@ -68,14 +75,9 @@ from register_toil import utils
     "--volumes",
     type=(click.Path(exists=True, resolve_path=True, dir_okay=True), str),
     multiple=True,
-    default=[
-        ("/ifs", "/ifs"),
-        ("/juno", "/juno"),
-        ("/work", "/work"),
-        ("/res", "/res"),
-    ],
+    default=[f"{i} {j}" for i, j in _DEFAULT_VOLUMES],
     show_default=True,
-    help="list of volumes tuples to be passed to the toil application",
+    help="volumes tuples to be passed to toil e.g. --volumes /juno /juno",
 )
 @click.option(
     "--singularity",
