@@ -33,7 +33,6 @@ Given this call, the following directory structure is created:
 
     /example/
     ├── bin
-    │   ├── toil_disambiguate -> /example/opt/toil_disambiguate/v0.1.2/toil_disambiguate
     │   └── toil_disambiguate_v0.1.2 -> /example/opt/toil_disambiguate/v0.1.2/toil_disambiguate
     └── opt
         └── toil_disambiguate
