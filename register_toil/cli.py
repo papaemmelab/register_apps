@@ -103,8 +103,7 @@ def main(
     optdir = Path(optdir) / pypi_name / pypi_version
     bindir = Path(bindir)
     optexe = optdir / pypi_name
-    binexe = bindir / pypi_name
-    binexe_versioned = bindir / f"{pypi_name}_{pypi_version}"
+    binexe = bindir / f"{pypi_name}_{pypi_version}"
 
     # make sure dirs exist
     optdir.mkdir(exist_ok=True, parents=True)
@@ -157,11 +156,7 @@ def main(
     optexe.write_text(f"#!/bin/bash\n{' '.join(command)}")
     optexe.chmod(mode=0o755)
     utils.force_symlink(optexe, binexe)
-    utils.force_symlink(optexe, binexe_versioned)
     click.secho(
-        f"\nExecutables available at:\n"
-        f"\n\t{str(optexe)}"
-        f"\n\t{str(binexe)}"
-        f"\n\t{str(binexe_versioned)}\n",
+        f"\nExecutables available at:\n" f"\n\t{str(optexe)}" f"\n\t{str(binexe)}\n",
         fg="green",
     )
