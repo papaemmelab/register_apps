@@ -7,7 +7,7 @@
 [![docker badge][automated_badge]][docker_base]
 [![code formatting][black_badge]][black_base]
 
-👾 Simple utility to register versioned [toil container] pipelines in a `bin` directory.
+👾 Register versioned [toil container] pipelines or other commands in singularity containers.
 
 ## Installation
 
@@ -48,6 +48,8 @@ And the executables look like this:
         --singularity /example/opt/toil_disambiguate/v0.1.2/toil_disambiguate-v0.1.2.simg \
         --volumes /ifs /ifs \
         --workDir $TMP_DIR $@
+
+Similar usage is provided to register regular commands that will run inside a container, see `register_singularity`.
 
 ## Contributing
 

@@ -15,6 +15,7 @@ RUN \
         python3-pip \
         python2.7 \
         python3.6 \
+        uuid-runtime \
     && apt-get clean \
     \
     # configure locale, see https://github.com/rocker-org/rocker/issues/19

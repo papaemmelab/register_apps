@@ -21,6 +21,7 @@ import shutil
 import subprocess
 
 import click
+from slugify import slugify
 
 from register_toil import __version__
 from register_toil import utils
@@ -86,7 +87,7 @@ _DEFAULT_VOLUMES = [
     default="singularity",
 )
 @click.version_option(version=__version__)
-def main(
+def register_toil(
     pypi_name,
     pypi_version,
     bindir,
@@ -104,6 +105,11 @@ def main(
     bindir = Path(bindir)
     optexe = optdir / pypi_name
     binexe = bindir / f"{pypi_name}_{pypi_version}"
+    image_url = image_url or f"docker://leukgen/{pypi_name}:{pypi_version}"
+
+    # check paths
+    assert python, "Could not determine the python path."
+    assert virtualenvwrapper, "Could not determine the virtualenvwrapper.sh path."
 
     # make sure dirs exist
     optdir.mkdir(exist_ok=True, parents=True)
@@ -129,26 +135,15 @@ def main(
     toolpath = subprocess.check_output(["/bin/bash", "-c", install_cmd])
     toolpath = toolpath.decode("utf-8").strip().split("\n")[-1]
 
-    # pull image
-    if not image_url:
-        image_url = f"docker://leukgen/{pypi_name}:{pypi_version}"
-
-    click.echo("Pulling image...")
-    subprocess.check_call(
-        ["/bin/bash", "-c", f"umask 22 && {singularity} pull {image_url}"], cwd=optdir
-    )
-
-    # fix singularity permissions
-    singularity_image = next(optdir.glob("*.simg"))
-    singularity_image.chmod(mode=0o755)
+    # build command
     command = [
         toolpath,
         "--singularity",
-        str(singularity_image),
+        _get_or_create_image(optdir, singularity, image_url),
         " ".join(f"--volumes {i} {j}" for i, j in volumes),
         "--workDir",
         tmpvar,
-        "$@\n",
+        '"$@"\n',
     ]
 
     # link executables
@@ -160,3 +155,136 @@ def main(
         f"\nExecutables available at:\n" f"\n\t{str(optexe)}" f"\n\t{str(binexe)}\n",
         fg="green",
     )
+
+
+@click.command()
+@click.option(
+    "--target",
+    show_default=True,
+    required=True,
+    help="name of the target script that will be created, please note that this name "
+    "will be slugified and the image_version will be appended (e.g. bwa_mem_pl_v1.0)",
+)
+@click.option(
+    "--command",
+    show_default=True,
+    required=True,
+    help="command that will be added at the end of the singularity exec instruction "
+    "(e.g. bwa_mem.pl)",
+)
+@click.option("--image_repository", required=True, help="docker hub repository name")
+@click.option("--image_version", required=True, help="docker hub image version")
+@click.option(
+    "--image_user",
+    default="leukgen",
+    help="docker hub user/organization name",
+    show_default=True,
+)
+@click.option(
+    "--image_url",
+    default=None,
+    help="image URL [default=docker://{image_user}/{image_repository}:{image_version}]",
+)
+@click.option(
+    "--bindir",
+    show_default=True,
+    type=click.Path(resolve_path=True, dir_okay=True),
+    help="path were executables will be linked to",
+    default=os.getenv("TOIL_REGISTER_BIN", "/work/isabl/local/bin"),
+)
+@click.option(
+    "--optdir",
+    show_default=True,
+    type=click.Path(resolve_path=True, dir_okay=True),
+    help="path were images will be versioned and cached",
+    default=os.getenv("TOIL_REGISTER_OPT", "/work/isabl/local/opt"),
+)
+@click.option(
+    "--tmpvar",
+    show_default=True,
+    help="environment variable used for --workdir",
+    default="$TMP_DIR",
+)
+@click.option(
+    "--volumes",
+    type=(click.Path(exists=True, resolve_path=True, dir_okay=True), str),
+    multiple=True,
+    default=[f"{i} {j}" for i, j in _DEFAULT_VOLUMES],
+    show_default=True,
+    help="volumes tuples to be passed to toil e.g. --volumes /juno /juno",
+)
+@click.option(
+    "--singularity",
+    show_default=True,
+    help="path to singularity",
+    default="singularity",
+)
+@click.version_option(version=__version__)
+def register_singularity(  # pylint: disable=R0913
+    bindir,
+    command,
+    image_repository,
+    image_url,
+    image_user,
+    image_version,
+    optdir,
+    singularity,
+    target,
+    tmpvar,
+    volumes,
+):
+    """Register versioned singularity command in a bin directory."""
+    target = f"{slugify(target, separator='_')}_{image_version}"
+    optdir = Path(optdir) / image_repository / image_version
+    bindir = Path(bindir)
+    optexe = optdir / target
+    binexe = bindir / target
+    image_url = image_url or f"docker://{image_user}/{image_repository}:{image_version}"
+
+    # make sure dirs exist
+    optdir.mkdir(exist_ok=True, parents=True)
+    bindir.mkdir(exist_ok=True, parents=True)
+
+    # build command
+    command = [
+        singularity,
+        "exec",
+        "--workdir",
+        f"{tmpvar}/${{USER}}_{image_repository}_{image_version}_`uuidgen`",
+        " ".join(f"--bind {i}:{j}" for i, j in volumes),
+        _get_or_create_image(optdir, singularity, image_url),
+        command,
+        '"$@"\n',
+    ]
+
+    # link executables
+    click.echo("Creating and linking executable...")
+    optexe.write_text(f"#!/bin/bash\n{' '.join(command)}")
+    optexe.chmod(mode=0o755)
+    utils.force_symlink(optexe, binexe)
+    click.secho(
+        f"\nExecutables available at:\n" f"\n\t{str(optexe)}" f"\n\t{str(binexe)}\n",
+        fg="green",
+    )
+
+
+def _get_or_create_image(optdir, singularity, image_url):
+    # pull image
+    singularity_images = list(optdir.glob("*.simg"))
+
+    assert (
+        not singularity_images or len(singularity_images) == 1
+    ), f"Found multiple images at {optdir}"
+
+    if singularity_images:
+        click.echo(f"Image exists at: {singularity_images[0]}")
+    else:
+        subprocess.check_call(
+            ["/bin/bash", "-c", f"umask 22 && {singularity} pull {image_url}"],
+            cwd=optdir,
+        )
+
+    # fix singularity permissions
+    singularity_image = next(optdir.glob("*.simg"))
+    singularity_image.chmod(mode=0o755)
+    return str(singularity_image)
