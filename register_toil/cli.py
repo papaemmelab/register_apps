@@ -21,7 +21,6 @@ import shutil
 import subprocess
 
 import click
-from slugify import slugify
 
 from register_toil import __version__
 from register_toil import utils
@@ -162,8 +161,7 @@ def register_toil(
     "--target",
     show_default=True,
     required=True,
-    help="name of the target script that will be created, please note that this name "
-    "will be slugified and the image_version will be appended (e.g. bwa_mem_pl_v1.0)",
+    help="name of the target script that will be created",
 )
 @click.option(
     "--command",
@@ -234,12 +232,15 @@ def register_singularity(  # pylint: disable=R0913
     volumes,
 ):
     """Register versioned singularity command in a bin directory."""
-    target = f"{slugify(target, separator='_')}_{image_version}"
     optdir = Path(optdir) / image_repository / image_version
     bindir = Path(bindir)
     optexe = optdir / target
     binexe = bindir / target
     image_url = image_url or f"docker://{image_user}/{image_repository}:{image_version}"
+
+    # do not overwrite targets
+    if os.path.isfile(optexe) or os.path.isfile(binexe):  # pragma: no cover
+        raise click.UsageError(f"Targets exist, exiting...\n\t{optexe}\n\t{binexe}")
 
     # make sure dirs exist
     optdir.mkdir(exist_ok=True, parents=True)

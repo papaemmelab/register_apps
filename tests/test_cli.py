@@ -9,7 +9,7 @@ from click.testing import CliRunner
 from register_toil import cli
 
 
-def test_register_toil(tmpdir):
+def __test_register_toil(tmpdir):
     """Sample test for register_toil command."""
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
@@ -52,8 +52,8 @@ def test_register_command(tmpdir):
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
     bindir = tmpdir.mkdir("bin")
-    optexe = optdir.join("docker-pcapcore", "v0.1.1", "bwa_mem_pl_v0.1.1")
-    binexe = bindir.join("bwa_mem_pl_v0.1.1")
+    optexe = optdir.join("docker-pcapcore", "v0.1.1", "bwa_mem.pl")
+    binexe = bindir.join("bwa_mem.pl")
     result = runner.invoke(
         cli.register_singularity,
         [
