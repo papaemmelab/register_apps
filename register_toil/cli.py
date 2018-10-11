@@ -25,12 +25,12 @@ import click
 from register_toil import __version__
 from register_toil import utils
 
-_DEFAULT_VOLUMES = [
+_DEFAULT_VOLUMES = (
     ("/ifs", "/ifs"),
     ("/juno", "/juno"),
     ("/work", "/work"),
     ("/res", "/res"),
-]
+)
 
 
 @click.command()
@@ -73,11 +73,11 @@ _DEFAULT_VOLUMES = [
 )
 @click.option(
     "--volumes",
-    type=(click.Path(exists=True, resolve_path=True, dir_okay=True), str),
+    type=click.Tuple([click.Path(exists=True, resolve_path=True, dir_okay=True), str]),
     multiple=True,
-    default=[f"{i} {j}" for i, j in _DEFAULT_VOLUMES],
-    show_default=True,
-    help="volumes tuples to be passed to toil e.g. --volumes /juno /juno",
+    default=None,
+    show_default=False,
+    help=f"volumes tuples to be passed to singularity [default={_DEFAULT_VOLUMES}]",
 )
 @click.option(
     "--singularity",
@@ -98,6 +98,7 @@ def register_toil(
     singularity,
 ):
     """Register versioned toil container pipelines in a bin directory."""
+    volumes = volumes or _DEFAULT_VOLUMES
     virtualenvwrapper = shutil.which("virtualenvwrapper.sh")
     python = shutil.which(python)
     optdir = Path(optdir) / pypi_name / pypi_version
@@ -205,11 +206,11 @@ def register_toil(
 )
 @click.option(
     "--volumes",
-    type=(click.Path(exists=True, resolve_path=True, dir_okay=True), str),
+    type=click.Tuple([click.Path(exists=True, resolve_path=True, dir_okay=True), str]),
     multiple=True,
-    default=[f"{i} {j}" for i, j in _DEFAULT_VOLUMES],
-    show_default=True,
-    help="volumes tuples to be passed to toil e.g. --volumes /juno /juno",
+    default=None,
+    show_default=False,
+    help=f"volumes tuples to be passed to singularity [default={_DEFAULT_VOLUMES}]",
 )
 @click.option(
     "--singularity",
@@ -232,6 +233,7 @@ def register_singularity(  # pylint: disable=R0913
     volumes,
 ):
     """Register versioned singularity command in a bin directory."""
+    volumes = volumes or _DEFAULT_VOLUMES
     optdir = Path(optdir) / image_repository / image_version
     bindir = Path(bindir)
     optexe = optdir / target

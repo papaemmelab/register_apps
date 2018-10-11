@@ -45,6 +45,7 @@ def __test_register_toil(tmpdir):
 
     assert "--volumes /tmp /carlos" in optexe.read()
     assert "--workDir $TMP" in optexe.read()
+    assert not runner.invoke(cli.register_toil, ["--help"]).exit_code
 
 
 def test_register_command(tmpdir):
@@ -91,3 +92,4 @@ def test_register_command(tmpdir):
 
     assert "--bind /tmp:/carlos" in optexe.read()
     assert "--workdir $TMP" in optexe.read()
+    assert not runner.invoke(cli.register_singularity, ["--help"]).exit_code
