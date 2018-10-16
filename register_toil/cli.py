@@ -25,6 +25,8 @@ import click
 from register_toil import __version__
 from register_toil import utils
 
+_DEFAULT_OPTDIR = "/work/isabl/local"
+_DEFAULT_BINDIR = "/work/isabl/bin"
 _DEFAULT_VOLUMES = (
     ("/ifs", "/ifs"),
     ("/juno", "/juno"),
@@ -50,14 +52,14 @@ _DEFAULT_VOLUMES = (
     show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
     help="path were executables will be linked to",
-    default=os.getenv("TOIL_REGISTER_BIN", "/work/isabl/local/bin"),
+    default=os.getenv("TOIL_REGISTER_BIN", _DEFAULT_BINDIR),
 )
 @click.option(
     "--optdir",
     show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
     help="path were images will be versioned and cached",
-    default=os.getenv("TOIL_REGISTER_OPT", "/work/isabl/local/opt"),
+    default=os.getenv("TOIL_REGISTER_OPT", _DEFAULT_OPTDIR),
 )
 @click.option(
     "--python",
@@ -189,14 +191,14 @@ def register_toil(
     show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
     help="path were executables will be linked to",
-    default=os.getenv("TOIL_REGISTER_BIN", "/work/isabl/local/bin"),
+    default=os.getenv("TOIL_REGISTER_BIN", _DEFAULT_BINDIR),
 )
 @click.option(
     "--optdir",
     show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
     help="path were images will be versioned and cached",
-    default=os.getenv("TOIL_REGISTER_OPT", "/work/isabl/local/opt"),
+    default=os.getenv("TOIL_REGISTER_OPT", _DEFAULT_OPTDIR),
 )
 @click.option(
     "--tmpvar",

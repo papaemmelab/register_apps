@@ -9,7 +9,7 @@ from click.testing import CliRunner
 from register_toil import cli
 
 
-def __test_register_toil(tmpdir):
+def test_register_toil(tmpdir):
     """Sample test for register_toil command."""
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
