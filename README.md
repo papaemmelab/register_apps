@@ -44,10 +44,10 @@ And the executables look like this:
 
     cat /example/bin/toil_disambiguate
     #!/bin/bash
-    /path/to/.virtualenvs/production__toil_disambiguate__v0.1.2/bin/toil_disambiguate \
+    /path/to/.virtualenvs/production__toil_disambiguate__v0.1.2/bin/toil_disambiguate $@ \
         --singularity /example/opt/toil_disambiguate/v0.1.2/toil_disambiguate-v0.1.2.simg \
         --volumes /ifs /ifs \
-        --workDir $TMP_DIR $@
+        --workDir $TMP_DIR
 
 Similar usage is provided to register regular commands that will run inside a container, see `register_singularity`.
 
