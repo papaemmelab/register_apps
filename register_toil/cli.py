@@ -140,12 +140,13 @@ def register_toil(
     # build command
     command = [
         toolpath,
+        '"$@"',
         "--singularity",
         _get_or_create_image(optdir, singularity, image_url),
         " ".join(f"--volumes {i} {j}" for i, j in volumes),
         "--workDir",
         tmpvar,
-        '"$@"\n',
+        "\n"
     ]
 
     # link executables
