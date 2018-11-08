@@ -256,6 +256,8 @@ def register_singularity(  # pylint: disable=R0913
         singularity,
         "exec",
         "--workdir",
+        "--pwd",
+        "`pwd`",
         f"{tmpvar}/${{USER}}_{image_repository}_{image_version}_`uuidgen`",
         " ".join(f"--bind {i}:{j}" for i, j in volumes),
         _get_or_create_image(optdir, singularity, image_url),
