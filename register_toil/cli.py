@@ -256,8 +256,6 @@ def register_singularity(  # pylint: disable=R0913
         singularity,
         "exec",
         "--workdir",
-        "--pwd",
-        "`pwd`",
         f"{tmpvar}/${{USER}}_{image_repository}_{image_version}_`uuidgen`",
         "--pwd",
         "`pwd`",
