@@ -48,8 +48,8 @@ def test_register_toil(tmpdir):
     assert not runner.invoke(cli.register_toil, ["--help"]).exit_code
 
 
-def test_register_command(tmpdir):
-    """Sample test for register_toil command."""
+def test_register_singularity(tmpdir):
+    """Sample test for register_singularity command."""
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
     bindir = tmpdir.mkdir("bin")
@@ -63,7 +63,7 @@ def test_register_command(tmpdir):
             "--image_version",
             "v0.1.1",
             "--image_user",
-            "leukgen",
+            "papaemmelab",
             "--volumes",
             "/tmp",
             "/carlos",
@@ -93,3 +93,34 @@ def test_register_command(tmpdir):
     assert "--bind /tmp:/carlos" in optexe.read()
     assert "--workdir $TMP" in optexe.read()
     assert not runner.invoke(cli.register_singularity, ["--help"]).exit_code
+
+
+def test_register_python(tmpdir):
+    """Sample test for register_python command."""
+    runner = CliRunner()
+    optdir = tmpdir.mkdir("opt")
+    bindir = tmpdir.mkdir("bin")
+    optexe = optdir.join("click_annotvcf", "v1.0.7", "click_annotvcf")
+    binexe = bindir.join("click_annotvcf_v0.1.7")
+    result = runner.invoke(
+        cli.register_toil,
+        [
+            "--pypi_name",
+            "click_annotvcf",
+            "--pypi_version",
+            "v0.1.7",
+            "--optdir",
+            optdir.strpath,
+            "--bindir",
+            bindir.strpath,
+        ],
+    )
+
+    if result.exit_code:
+        print(vars(result))
+
+    for i in optexe.strpath, binexe.strpath:
+        assert b"0.1.7" in subprocess.check_output(
+            args=[i, "--version"], stderr=subprocess.STDOUT
+        )
+    assert not runner.invoke(cli.register_toil, ["--help"]).exit_code

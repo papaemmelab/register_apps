@@ -45,7 +45,7 @@ _DEFAULT_VOLUMES = (
 @click.option(
     "--image_url",
     default=None,
-    help="docker image URL [default=leukgen/{pypi_name}:{pypi_version}]",
+    help="docker image URL [default=papaemmelab/{pypi_name}:{pypi_version}]",
 )
 @click.option(
     "--bindir",
@@ -107,7 +107,7 @@ def register_toil(
     bindir = Path(bindir)
     optexe = optdir / pypi_name
     binexe = bindir / f"{pypi_name}_{pypi_version}"
-    image_url = image_url or f"docker://leukgen/{pypi_name}:{pypi_version}"
+    image_url = image_url or f"docker://papaemmelab/{pypi_name}:{pypi_version}"
 
     # check paths
     assert python, "Could not determine the python path."
@@ -146,7 +146,7 @@ def register_toil(
         " ".join(f"--volumes {i} {j}" for i, j in volumes),
         "--workDir",
         tmpvar,
-        "\n"
+        "\n",
     ]
 
     # link executables
@@ -178,7 +178,7 @@ def register_toil(
 @click.option("--image_version", required=True, help="docker hub image version")
 @click.option(
     "--image_user",
-    default="leukgen",
+    default="papaemmelab",
     help="docker hub user/organization name",
     show_default=True,
 )
@@ -264,6 +264,85 @@ def register_singularity(  # pylint: disable=R0913
         command,
         '"$@"\n',
     ]
+
+    # link executables
+    click.echo("Creating and linking executable...")
+    optexe.write_text(f"#!/bin/bash\n{' '.join(command)}")
+    optexe.chmod(mode=0o755)
+    utils.force_symlink(optexe, binexe)
+    click.secho(
+        f"\nExecutables available at:\n" f"\n\t{str(optexe)}" f"\n\t{str(binexe)}\n",
+        fg="green",
+    )
+
+
+@click.command()
+@click.option(
+    "--pypi_name", show_default=True, required=True, help="package name in PyPi"
+)
+@click.option(
+    "--pypi_version", show_default=True, required=True, help="package version in PyPi"
+)
+@click.option(
+    "--bindir",
+    show_default=True,
+    type=click.Path(resolve_path=True, dir_okay=True),
+    help="path were executables will be linked to",
+    default=os.getenv("PYTHON_REGISTER_BIN", _DEFAULT_BINDIR),
+)
+@click.option(
+    "--optdir",
+    show_default=True,
+    type=click.Path(resolve_path=True, dir_okay=True),
+    help="path were images will be versioned and cached",
+    default=os.getenv("PYTHON_REGISTER_OPT", _DEFAULT_OPTDIR),
+)
+@click.option(
+    "--python",
+    show_default=True,
+    help="which python to be used for the virtual environment",
+    default="python3",
+)
+@click.version_option(version=__version__)
+def register_python(pypi_name, pypi_version, bindir, optdir, python):
+    """Register versioned python pipelines in a bin directory."""
+    virtualenvwrapper = shutil.which("virtualenvwrapper.sh")
+    python = shutil.which(python)
+    optdir = Path(optdir) / pypi_name / pypi_version
+    bindir = Path(bindir)
+    optexe = optdir / pypi_name
+    binexe = bindir / f"{pypi_name}_{pypi_version}"
+
+    # check paths
+    assert python, "Could not determine the python path."
+    assert virtualenvwrapper, "Could not determine the virtualenvwrapper.sh path."
+
+    # make sure dirs exist
+    optdir.mkdir(exist_ok=True, parents=True)
+    bindir.mkdir(exist_ok=True, parents=True)
+
+    # create virtual environment and install package
+    env = f"production__{pypi_name}__{pypi_version}"
+    click.echo(f"Creating virtual environment '{env}'...")
+    subprocess.check_output(
+        [
+            "/bin/bash",
+            "-c",
+            f"source {virtualenvwrapper} && mkvirtualenv -p {python} {env}",
+        ]
+    )
+
+    install_cmd = (
+        f"source {virtualenvwrapper} && workon {env} && "
+        f"pip install {pypi_name}=={pypi_version} && which {pypi_name}"
+    )
+
+    click.echo(f"Installing package with '{install_cmd}'...")
+    toolpath = subprocess.check_output(["/bin/bash", "-c", install_cmd])
+    toolpath = toolpath.decode("utf-8").strip().split("\n")[-1]
+
+    # build command
+    command = [toolpath, '"$@"', "\n"]
 
     # link executables
     click.echo("Creating and linking executable...")

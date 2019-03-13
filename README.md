@@ -58,23 +58,23 @@ Contributions are welcome, and they are greatly appreciated, check our [contribu
 ## Credits
 
 This package was created using [Cookiecutter] and the
-[leukgen/cookiecutter-toil] project template.
+[papaemmelab/cookiecutter-toil] project template.
 
 [virtual environments]: http://virtualenvwrapper.readthedocs.io/en/latest/
-[toil container]: https://github.com/leukgen/toil_container
+[toil container]: https://github.com/papaemmelab/toil_container
 [singularity]: http://singularity.lbl.gov/
 [docker2singularity]: https://github.com/singularityware/docker2singularity
 [cookiecutter]: https://github.com/audreyr/cookiecutter
-[leukgen/cookiecutter-toil]: https://github.com/leukgen/cookiecutter-toil
+[papaemmelab/cookiecutter-toil]: https://github.com/papaemmelab/cookiecutter-toil
 [`--batchSystem`]: http://toil.readthedocs.io/en/latest/developingWorkflows/batchSystem.html?highlight=BatchSystem
-[docker_base]: https://hub.docker.com/r/leukgen/register_toil
-[docker_badge]: https://img.shields.io/docker/build/leukgen/register_toil.svg
-[automated_badge]: https://img.shields.io/docker/automated/leukgen/register_toil.svg
-[codecov_badge]: https://codecov.io/gh/leukgen/register_toil/branch/master/graph/badge.svg
-[codecov_base]: https://codecov.io/gh/leukgen/register_toil
+[docker_base]: https://hub.docker.com/r/papaemmelab/register_toil
+[docker_badge]: https://img.shields.io/docker/build/papaemmelab/register_toil.svg
+[automated_badge]: https://img.shields.io/docker/automated/papaemmelab/register_toil.svg
+[codecov_badge]: https://codecov.io/gh/papaemmelab/register_toil/branch/master/graph/badge.svg
+[codecov_base]: https://codecov.io/gh/papaemmelab/register_toil
 [pypi_badge]: https://img.shields.io/pypi/v/register_toil.svg
 [pypi_base]: https://pypi.org/pypi/register_toil
-[travis_badge]: https://img.shields.io/travis/leukgen/register_toil.svg
-[travis_base]: https://travis-ci.org/leukgen/register_toil
+[travis_badge]: https://img.shields.io/travis/papaemmelab/register_toil.svg
+[travis_base]: https://travis-ci.org/papaemmelab/register_toil
 [black_badge]: https://img.shields.io/badge/code%20style-black-000000.svg
 [black_base]: https://github.com/ambv/black
