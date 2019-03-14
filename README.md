@@ -15,41 +15,103 @@ This package is available at [PyPi][pypi_base]:
 
     pip install register_apps
 
-⚠️ **WARNING:** This package only works with singularity 2.4+
-
 ## Usage
 
-`register_toil` will install [toil container] pipelines in separate [virtual environments], pull a singularity image from the dockerhub and create executables that call the pipeline with the right parameters:
+This package it's used to register versionized and containerized applications within a production environment. It provides 3 commands:
+* 🍡 `register_toil`
+* 📦 `register_singularity`
+* 🐍 `register_python`
 
-    register_toil \
-        --bindir /example/bin \
-        --optdir /example/opt \
-        --tmpvar $TMP \
-        --pypi_name toil_disambiguate \
-        --pypi_version v0.1.2 \
-        --volumes /ifs /ifs
+⚠️ **WARNING:** This package only works with singularity 2.4+
 
-Given this call, the following directory structure is created:
+### Register a toil containerized application
 
-    /example/
-    ├── bin
-    │   └── toil_disambiguate_v0.1.2 -> /example/opt/toil_disambiguate/v0.1.2/toil_disambiguate
-    └── opt
-        └── toil_disambiguate
-            └── v0.1.2
-                ├── toil_disambiguate
-                └── toil_disambiguate-v0.1.2.simg
+* 🍡 **`register_toil`** will install [toil container] pipelines in separate [virtual environments], pull a singularity image from the dockerhub and create executables that call the pipeline with the right parameters:
 
-And the executables look like this:
+        register_toil \
+            --pypi_name toil_disambiguate \
+            --pypi_version v0.1.2 \
+            --bindir /example/bin \
+            --optdir /example/opt \
+            --tmpvar $TMP \
+            --volumes /ifs /ifs
 
-    cat /example/bin/toil_disambiguate
-    #!/bin/bash
-    /path/to/.virtualenvs/production__toil_disambiguate__v0.1.2/bin/toil_disambiguate $@ \
-        --singularity /example/opt/toil_disambiguate/v0.1.2/toil_disambiguate-v0.1.2.simg \
-        --volumes /ifs /ifs \
-        --workDir $TMP_DIR
+    Given this call, the following directory structure is created:
 
-Similar usage is provided to register regular commands that will run inside a container, see `register_singularity`.
+        /example/
+        ├── bin
+        │   └── toil_disambiguate_v0.1.2 -> /example/opt/toil_disambiguate/v0.1.2/toil_disambiguate
+        └── opt
+            └── toil_disambiguate
+                └── v0.1.2
+                    ├── toil_disambiguate
+                    └── toil_disambiguate-v0.1.2.simg
+
+    And the executables look like this:
+
+        cat /example/bin/toil_disambiguate
+        #!/bin/bash
+        /path/to/.virtualenvs/production__toil_disambiguate__v0.1.2/bin/toil_disambiguate $@ \
+            --singularity /example/opt/toil_disambiguate/v0.1.2/toil_disambiguate-v0.1.2.simg \
+            --volumes /ifs /ifs \
+            --workDir $TMP_DIR
+
+* 📦 **`register_singularity`** provides a similar usage to register regular commands that will run inside a container, it will create the same directory structure but the executables created will execute commands inside the container:
+
+        register_singularity \
+            --target svaba \
+            --command svaba \
+            --image_url docker://papaemmelab/docker-svaba:v1.0.0 \
+            --bindir /example/bin \
+            --optdir /example/opt \
+            --tmpvar $TMP \
+            --volumes /ifs /ifs
+
+    Given this call, the following directory structure is created:
+
+        /example/
+        ├── bin
+        │   └── svaba -> /example/opt/docker-svaba/v1.0.0/svaba
+        └── opt
+            └── docker_svaba
+                └── v1.0.0
+                    ├── svaba
+                    └── docker-svaba-v1.0.0
+
+    And the executables look like this:
+
+        cat /example/bin/svaba
+        #!/bin/bash
+        singularity exec \
+            --workdir $TMP_DIR/${USER}_docker-svaba_v1.0.0_`uuidgen` \
+            --pwd `pwd` \
+            --bind /ifs:/ifs \
+            /example/opt/docker-svaba/v1.0.0/docker-svaba-v1.0.0.simg svaba "$@"
+
+* 🐍 **`register_python`** provides a method to register python packages without registering to run inside a container. It will create a similiar versionized directory structure and installing the python package and its dependencies within a virtual environemnt:
+
+        register_python \
+            --pypi_name click_annotvcf \
+            --pypi_version v1.0.7
+            --bindir /example/bin \
+            --optdir /example/opt
+
+    Given this call, the following directory structure is created:
+
+        /example/
+        ├── bin
+        │   └── click_annotvcf_v1.0.7 -> /example/opt/click_annotvcfs/v1.0.7/click_annotvcf
+        └── opt
+            └── click_annotvcf
+                └── v1.0.7
+                    └── click_annotvcf
+
+    And the executables look like this:
+
+        cat /example/bin/click_annotvcf_v1.0.7
+        #!/bin/bash
+        /path/to/.virtualenvs/production__click_annotvcf__v1.0.7/bin/click_annotvcf "$@"
+
 
 ## Contributing
 
