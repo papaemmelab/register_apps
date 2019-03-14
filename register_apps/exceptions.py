@@ -1,9 +1,9 @@
-"""register_toil specific exceptions."""
+"""register_apps specific exceptions."""
 
 
 class PackageBaseException(Exception):
 
-    """A base exception for register_toil."""
+    """A base exception for register_apps."""
 
 
 class ValidationError(PackageBaseException):

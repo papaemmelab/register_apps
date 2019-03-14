@@ -1,14 +1,14 @@
 [paths]
 source =
-   register_toil
-   */register_toil
+   register_apps
+   */register_apps
 
 [run]
 source =
-    register_toil
+    register_apps
 
 omit =
-    *register_toil/__main__.py
+    *register_apps/__main__.py
 
 [report]
 exclude_lines =

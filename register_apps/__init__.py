@@ -1,4 +1,4 @@
-"""register_toil module."""
+"""register_apps module."""
 
 from os.path import abspath
 from os.path import dirname

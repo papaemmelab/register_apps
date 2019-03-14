@@ -5,12 +5,12 @@ Why does this file exist, and why not put this in __main__?
 You might be tempted to import things from __main__ later, but that will
 cause problems, the code will get executed twice:
 
-    - When you run `python -m register_toil` python will execute
+    - When you run `python -m register_apps` python will execute
       `__main__.py` as a script. That means there won't be any
-      `register_toil.__main__` in `sys.modules`.
+      `register_apps.__main__` in `sys.modules`.
 
     - When you import __main__ it will get executed again (as a module) because
-      there's no `register_toil.__main__` in `sys.modules`.
+      there's no `register_apps.__main__` in `sys.modules`.
 
 Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
@@ -22,72 +22,22 @@ import subprocess
 
 import click
 
-from register_toil import __version__
-from register_toil import utils
-
-_DEFAULT_OPTDIR = "/work/isabl/local"
-_DEFAULT_BINDIR = "/work/isabl/bin"
-_DEFAULT_VOLUMES = (
-    ("/ifs", "/ifs"),
-    ("/juno", "/juno"),
-    ("/work", "/work"),
-    ("/res", "/res"),
-)
+from register_apps import options
+from register_apps import utils
 
 
 @click.command()
-@click.option(
-    "--pypi_name", show_default=True, required=True, help="package name in PyPi"
-)
-@click.option(
-    "--pypi_version", show_default=True, required=True, help="package version in PyPi"
-)
-@click.option(
-    "--image_url",
-    default=None,
-    help="docker image URL [default=papaemmelab/{pypi_name}:{pypi_version}]",
-)
-@click.option(
-    "--bindir",
-    show_default=True,
-    type=click.Path(resolve_path=True, dir_okay=True),
-    help="path were executables will be linked to",
-    default=os.getenv("TOIL_REGISTER_BIN", _DEFAULT_BINDIR),
-)
-@click.option(
-    "--optdir",
-    show_default=True,
-    type=click.Path(resolve_path=True, dir_okay=True),
-    help="path were images will be versioned and cached",
-    default=os.getenv("TOIL_REGISTER_OPT", _DEFAULT_OPTDIR),
-)
-@click.option(
-    "--python",
-    show_default=True,
-    help="which python to be used for the virtual environment",
-    default="python2",
-)
-@click.option(
-    "--tmpvar",
-    show_default=True,
-    help="environment variable used for workdir: --workDir ${tmpvar}",
-    default="$TMP_DIR",
-)
-@click.option(
-    "--volumes",
-    type=click.Tuple([click.Path(exists=True, resolve_path=True, dir_okay=True), str]),
-    multiple=True,
-    default=None,
-    show_default=False,
-    help=f"volumes tuples to be passed to singularity [default={_DEFAULT_VOLUMES}]",
-)
-@click.option(
-    "--singularity",
-    show_default=True,
-    help="path to singularity",
-    default="singularity",
-)
-@click.version_option(version=__version__)
+@options.PYPI_NAME
+@options.PYPI_VERSION
+@options.IMAGE_USER
+@options.IMAGE_URL
+@options.BINDIR
+@options.OPTDIR
+@options.PYTHON2
+@options.TMPVAR
+@options.VOLUMES
+@options.SINGULARITY
+@options.VERSION
 def register_toil(
     pypi_name,
     pypi_version,
@@ -97,17 +47,17 @@ def register_toil(
     volumes,
     tmpvar,
     image_url,
+    image_user,
     singularity,
 ):
     """Register versioned toil container pipelines in a bin directory."""
-    volumes = volumes or _DEFAULT_VOLUMES
     virtualenvwrapper = shutil.which("virtualenvwrapper.sh")
     python = shutil.which(python)
     optdir = Path(optdir) / pypi_name / pypi_version
     bindir = Path(bindir)
     optexe = optdir / pypi_name
     binexe = bindir / f"{pypi_name}_{pypi_version}"
-    image_url = image_url or f"docker://papaemmelab/{pypi_name}:{pypi_version}"
+    image_url = image_url or f"docker://{image_user}/{pypi_name}:{pypi_version}"
 
     # check paths
     assert python, "Could not determine the python path."
@@ -161,67 +111,17 @@ def register_toil(
 
 
 @click.command()
-@click.option(
-    "--target",
-    show_default=True,
-    required=True,
-    help="name of the target script that will be created",
-)
-@click.option(
-    "--command",
-    show_default=True,
-    required=True,
-    help="command that will be added at the end of the singularity exec instruction "
-    "(e.g. bwa_mem.pl)",
-)
-@click.option("--image_repository", required=True, help="docker hub repository name")
-@click.option("--image_version", required=True, help="docker hub image version")
-@click.option(
-    "--image_user",
-    default="papaemmelab",
-    help="docker hub user/organization name",
-    show_default=True,
-)
-@click.option(
-    "--image_url",
-    default=None,
-    help="image URL [default=docker://{image_user}/{image_repository}:{image_version}]",
-)
-@click.option(
-    "--bindir",
-    show_default=True,
-    type=click.Path(resolve_path=True, dir_okay=True),
-    help="path were executables will be linked to",
-    default=os.getenv("TOIL_REGISTER_BIN", _DEFAULT_BINDIR),
-)
-@click.option(
-    "--optdir",
-    show_default=True,
-    type=click.Path(resolve_path=True, dir_okay=True),
-    help="path were images will be versioned and cached",
-    default=os.getenv("TOIL_REGISTER_OPT", _DEFAULT_OPTDIR),
-)
-@click.option(
-    "--tmpvar",
-    show_default=True,
-    help="environment variable used for --workdir",
-    default="$TMP_DIR",
-)
-@click.option(
-    "--volumes",
-    type=click.Tuple([click.Path(exists=True, resolve_path=True, dir_okay=True), str]),
-    multiple=True,
-    default=None,
-    show_default=False,
-    help=f"volumes tuples to be passed to singularity [default={_DEFAULT_VOLUMES}]",
-)
-@click.option(
-    "--singularity",
-    show_default=True,
-    help="path to singularity",
-    default="singularity",
-)
-@click.version_option(version=__version__)
+@options.TARGET
+@options.COMMAND
+@options.IMAGE_REPOSITORY
+@options.IMAGE_VERSION
+@options.IMAGE_USER
+@options.BINDIR
+@options.OPTDIR
+@options.TMPVAR
+@options.VOLUMES
+@options.SINGULARITY
+@options.VERSION
 def register_singularity(  # pylint: disable=R0913
     bindir,
     command,
@@ -236,7 +136,6 @@ def register_singularity(  # pylint: disable=R0913
     volumes,
 ):
     """Register versioned singularity command in a bin directory."""
-    volumes = volumes or _DEFAULT_VOLUMES
     optdir = Path(optdir) / image_repository / image_version
     bindir = Path(bindir)
     optexe = optdir / target
@@ -277,33 +176,12 @@ def register_singularity(  # pylint: disable=R0913
 
 
 @click.command()
-@click.option(
-    "--pypi_name", show_default=True, required=True, help="package name in PyPi"
-)
-@click.option(
-    "--pypi_version", show_default=True, required=True, help="package version in PyPi"
-)
-@click.option(
-    "--bindir",
-    show_default=True,
-    type=click.Path(resolve_path=True, dir_okay=True),
-    help="path were executables will be linked to",
-    default=os.getenv("PYTHON_REGISTER_BIN", _DEFAULT_BINDIR),
-)
-@click.option(
-    "--optdir",
-    show_default=True,
-    type=click.Path(resolve_path=True, dir_okay=True),
-    help="path were images will be versioned and cached",
-    default=os.getenv("PYTHON_REGISTER_OPT", _DEFAULT_OPTDIR),
-)
-@click.option(
-    "--python",
-    show_default=True,
-    help="which python to be used for the virtual environment",
-    default="python3",
-)
-@click.version_option(version=__version__)
+@options.PYPI_NAME
+@options.PYPI_VERSION
+@options.BINDIR
+@options.OPTDIR
+@options.PYTHON3
+@options.VERSION
 def register_python(pypi_name, pypi_version, bindir, optdir, python):
     """Register versioned python pipelines in a bin directory."""
     virtualenvwrapper = shutil.which("virtualenvwrapper.sh")

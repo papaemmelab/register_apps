@@ -1,10 +1,10 @@
-"""register_toil validators tests."""
+"""register_apps validators tests."""
 
 from os.path import join
 import pytest
 
-from register_toil import exceptions
-from register_toil import validators
+from register_apps import exceptions
+from register_apps import validators
 
 
 def test_validate_patterns_are_files(tmpdir):

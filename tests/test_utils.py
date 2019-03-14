@@ -1,10 +1,10 @@
-"""register_toil utils tests."""
+"""register_apps utils tests."""
 
 from os.path import join
 import os
 import tarfile
 
-from register_toil import utils
+from register_apps import utils
 
 
 def test_force_symlink(tmpdir):
@@ -99,3 +99,4 @@ def test_tar_dir(tmpdir):
         i = i.replace(source_dir, join(dst_dir, "source_dir"))
         with open(i, "r") as f:
             assert j in f.read()
+

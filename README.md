@@ -1,4 +1,4 @@
-# register_toil
+# register_apps
 
 [![pypi badge][pypi_badge]][pypi_base]
 [![travis badge][travis_badge]][travis_base]
@@ -13,7 +13,7 @@
 
 This package is available at [PyPi][pypi_base]:
 
-    pip install register_toil
+    pip install register_apps
 
 ⚠️ **WARNING:** This package only works with singularity 2.4+
 
@@ -67,14 +67,14 @@ This package was created using [Cookiecutter] and the
 [cookiecutter]: https://github.com/audreyr/cookiecutter
 [papaemmelab/cookiecutter-toil]: https://github.com/papaemmelab/cookiecutter-toil
 [`--batchSystem`]: http://toil.readthedocs.io/en/latest/developingWorkflows/batchSystem.html?highlight=BatchSystem
-[docker_base]: https://hub.docker.com/r/papaemmelab/register_toil
-[docker_badge]: https://img.shields.io/docker/build/papaemmelab/register_toil.svg
-[automated_badge]: https://img.shields.io/docker/automated/papaemmelab/register_toil.svg
-[codecov_badge]: https://codecov.io/gh/papaemmelab/register_toil/branch/master/graph/badge.svg
-[codecov_base]: https://codecov.io/gh/papaemmelab/register_toil
-[pypi_badge]: https://img.shields.io/pypi/v/register_toil.svg
-[pypi_base]: https://pypi.org/pypi/register_toil
-[travis_badge]: https://img.shields.io/travis/papaemmelab/register_toil.svg
-[travis_base]: https://travis-ci.org/papaemmelab/register_toil
+[docker_base]: https://hub.docker.com/r/papaemmelab/register_apps
+[docker_badge]: https://img.shields.io/docker/build/papaemmelab/register_apps.svg
+[automated_badge]: https://img.shields.io/docker/automated/papaemmelab/register_apps.svg
+[codecov_badge]: https://codecov.io/gh/papaemmelab/register_apps/branch/master/graph/badge.svg
+[codecov_base]: https://codecov.io/gh/papaemmelab/register_apps
+[pypi_badge]: https://img.shields.io/pypi/v/register_apps.svg
+[pypi_base]: https://pypi.org/pypi/register_apps
+[travis_badge]: https://img.shields.io/travis/papaemmelab/register_apps.svg
+[travis_base]: https://travis-ci.org/papaemmelab/register_apps
 [black_badge]: https://img.shields.io/badge/code%20style-black-000000.svg
 [black_base]: https://github.com/ambv/black

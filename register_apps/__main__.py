@@ -1,5 +1,5 @@
 """
-Entrypoint module, in case you use `python -m register_toil`.
+Entrypoint module, in case you use `python -m register_apps`.
 
 Why does this file exist, and why __main__? For more info, read:
 
@@ -7,7 +7,7 @@ Why does this file exist, and why __main__? For more info, read:
 - https://docs.python.org/3/using/cmdline.html#cmdoption-m
 """
 
-from register_toil.cli import main
+from register_apps.cli import main
 
 if __name__ == "__main__":
     main()  # pylint: disable=no-value-for-parameter

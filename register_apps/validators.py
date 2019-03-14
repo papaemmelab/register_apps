@@ -1,9 +1,9 @@
-"""register_toil validators."""
+"""register_apps validators."""
 
 from glob import glob
 import os
 
-from register_toil import exceptions
+from register_apps import exceptions
 
 
 def validate_patterns_are_files(patterns, check_size=True):
