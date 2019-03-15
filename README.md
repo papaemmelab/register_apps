@@ -18,6 +18,7 @@ This package is available at [PyPi][pypi_base]:
 ## Usage
 
 This package it's used to register versionized and containerized applications within a production environment. It provides 3 commands:
+
 * 🍡 `register_toil`
 * 📦 `register_singularity`
 * 🐍 `register_python`

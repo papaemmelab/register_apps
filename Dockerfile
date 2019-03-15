@@ -50,3 +50,5 @@ RUN \
 
 # add entry point
 ENTRYPOINT ["register_toil"]
+CMD ["--help"]
+
