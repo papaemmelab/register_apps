@@ -114,8 +114,9 @@ def register_toil(
 @options.TARGET
 @options.COMMAND
 @options.IMAGE_REPOSITORY
-@options.IMAGE_VERSION
 @options.IMAGE_USER
+@options.IMAGE_VERSION
+@options.IMAGE_URL
 @options.BINDIR
 @options.OPTDIR
 @options.TMPVAR
