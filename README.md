@@ -7,7 +7,7 @@
 [![docker badge][automated_badge]][docker_base]
 [![code formatting][black_badge]][black_base]
 
-👾 Register versioned [toil container] pipelines or other commands in singularity containers.
+👾 Register versioned [toil container] pipelines, singularity containers, and python packages.
 
 ## Installation
 
