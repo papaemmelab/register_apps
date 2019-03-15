@@ -6,7 +6,7 @@ echo "testing container..."
 # make sure current dir is repo dir
 cd $( dirname "${BASH_SOURCE[0]}" )
 
-TEST_IMAGE="register_toil_test_image"
+TEST_IMAGE="register_apps_test_image"
 
 if [ "$1" = "--skip-build" ]; then
     echo "skipping build..."
@@ -25,8 +25,8 @@ find . -name '__pycache__' -exec rm -rf {} +
 
 # run tox inside the container
 docker run --rm $TEST_IMAGE --version
-docker run --privileged --rm --entrypoint "" -v `pwd`:/test -w /test \
-    $TEST_IMAGE bash -c "cp -r /test /register_toil && cd /register_toil && pip install tox && tox && cp .coverage /test"
+docker run -it --privileged --rm --entrypoint "" -v `pwd`:/test -w /test \
+    $TEST_IMAGE bash -c "cp -r /test /register_apps && cd /register_apps && pip install tox && tox && cp .coverage /test"
 
 # move container coverage paths to local, see .coveragerc [paths] and this comment:
 # https://github.com/pytest-dev/pytest-cov/issues/146#issuecomment-272971136

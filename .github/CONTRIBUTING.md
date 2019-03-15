@@ -10,9 +10,9 @@ Follow these steps for local development:
 
 1. Bet you've read the [Zen Of Python].
 
-1. Clone your register_toil locally:
+1. Clone your register_apps locally:
 
-        git clone git@github.com:leukgen/register_toil.git
+        git clone git@github.com:papaemmelab/register_apps.git
 
 1. Create a branch for local development:
 
@@ -23,7 +23,7 @@ Follow these steps for local development:
 
 1. Create a test in:
 
-        register_toil/tests
+        register_apps/tests
 
 1. Run [pytest] with [coverage], [pylint] and [pydocstyle] using [tox]:
 
@@ -31,12 +31,12 @@ Follow these steps for local development:
 
     To just run [pytest]:
 
-        py.test tests --cov=register_toil
+        py.test tests --cov=register_apps
 
     To just check that your changes pass our [pylint] and [pydocstyle] requirements:
 
-        pylint --rcfile=.pylintrc register_toil
-        pydocstyle --config=.pydocstylerc register_toil
+        pylint --rcfile=.pylintrc register_apps
+        pydocstyle --config=.pydocstylerc register_apps
 
 1. Run tests inside the docker container:
 
@@ -64,21 +64,21 @@ Follow these steps for local development:
 
     If you are suggesting a new version make sure you are following the [semantic versioning] guidelines and then update the [`VERSION`] file:
 
-        git add register_toil/VERSION
+        git add register_apps/VERSION
         git commit -m ":gem: bump to version 0.1.0"
 
 1. Submit a [pull request] through the GitHub website.
 
 <!-- References -->
-[`VERSION`]: ../leukgen/VERSION
+[`VERSION`]: ../papaemmelab/VERSION
 [`.gitmessage`]: ../.gitmessage
 [pytest]: https://docs.pytest.org/en/latest/
 [pytest-env]: https://github.com/MobileDynasty/pytest-env
 [semantic versioning]: http://semver.org/
 [tox]: http://tox.readthedocs.io/
-[pulls]: https://github.com/leukgen/register_toil/pulls
+[pulls]: https://github.com/papaemmelab/register_apps/pulls
 [pydocstyle]: http://www.pydocstyle.org/en
 [pylint]: https://www.pylint.org/
 [coverage]:https://coverage.readthedocs.io
-[pull request]: https://github.com/leukgen/register_toil/compare
+[pull request]: https://github.com/papaemmelab/register_apps/compare
 [zen of python]: https://www.python.org/dev/peps/pep-0020/#the-zen-of-python

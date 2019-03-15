@@ -11,21 +11,23 @@
     ],
     "entry_points": {
         "console_scripts": [
-            "register_toil=register_toil.cli:register_toil",
-            "register_singularity=register_toil.cli:register_singularity"
+            "register_toil=register_apps.cli:register_toil",
+            "register_singularity=register_apps.cli:register_singularity",
+            "register_python=register_apps.cli:register_python"
         ]
     },
     "setup_requires": [
         "pytest-runner==2.11.1"
     ],
     "install_requires": [
-        "Click==6.7",
+        "click==6.7",
         "virtualenvwrapper==4.8.2"
     ],
     "extras_require": {
         "test": [
             "coverage==4.4.2",
             "pydocstyle==2.1.1",
+            "pytest==3.2.3",
             "pytest-cov==2.5.1",
             "pytest-env==0.6.2",
             "pylint==1.8.1",
@@ -35,9 +37,9 @@
     "author": "Juan S. Medina",
     "keywords": [],
     "license": "BSD",
-    "name": "register_toil",
+    "name": "register_apps",
     "test_suite": "tests",
-    "long_description": "📘 learn more on `GitHub <https://github.com/leukgen/register_toil>`_!",
+    "long_description": "📘 learn more on `GitHub <https://github.com/papaemmelab/register_apps>`_!",
     "description": "👾 Register versioned toil container pipelines and other commands in singularity containers.",
-    "url": "https://github.com/leukgen/register_toil"
+    "url": "https://github.com/papaemmelab/register_apps"
 }

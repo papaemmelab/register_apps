@@ -1,6 +1,6 @@
-"""register_toil version test."""
+"""register_apps version test."""
 
-from register_toil import __version__
+from register_apps import __version__
 
 
 def test_version():

@@ -1,4 +1,4 @@
-"""register_toil utils."""
+"""register_apps utils."""
 
 import os
 import tarfile

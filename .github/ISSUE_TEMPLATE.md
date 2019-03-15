@@ -1,4 +1,4 @@
-* register_toil version:
+* register_apps version:
 * Python version:
 * Operating System:
 

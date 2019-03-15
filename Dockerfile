@@ -41,7 +41,7 @@ ENV LANG en_US.UTF-8
 ENV OUTPUT_DIR /data
 VOLUME ${OUTPUT_DIR}
 
-# install register_toil
+# install register_apps
 COPY . /code
 RUN \
     pip3 install /code \
@@ -50,3 +50,5 @@ RUN \
 
 # add entry point
 ENTRYPOINT ["register_toil"]
+CMD ["--help"]
+
