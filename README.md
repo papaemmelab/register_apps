@@ -131,8 +131,8 @@ This package was created using [Cookiecutter] and the
 [papaemmelab/cookiecutter-toil]: https://github.com/papaemmelab/cookiecutter-toil
 [`--batchSystem`]: http://toil.readthedocs.io/en/latest/developingWorkflows/batchSystem.html?highlight=BatchSystem
 [docker_base]: https://hub.docker.com/r/papaemmelab/register_apps
-[docker_badge]: https://img.shields.io/docker/build/papaemmelab/register_apps.svg
-[automated_badge]: https://img.shields.io/docker/automated/papaemmelab/register_apps.svg
+[docker_badge]: https://img.shields.io/docker/cloud/build/papaemmelab/register_apps.svg
+[automated_badge]: https://img.shields.io/docker/cloud/automated/papaemmelab/register_apps.svg
 [codecov_badge]: https://codecov.io/gh/papaemmelab/register_apps/branch/master/graph/badge.svg
 [codecov_base]: https://codecov.io/gh/papaemmelab/register_apps
 [pypi_badge]: https://img.shields.io/pypi/v/register_apps.svg
