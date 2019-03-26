@@ -31,6 +31,7 @@ from register_apps import utils
 @options.PYPI_VERSION
 @options.IMAGE_USER
 @options.IMAGE_URL
+@options.GITHUB_USER
 @options.BINDIR
 @options.OPTDIR
 @options.PYTHON2
@@ -48,6 +49,7 @@ def register_toil(
     tmpvar,
     image_url,
     image_user,
+    github_user,
     singularity,
 ):
     """Register versioned toil container pipelines in a bin directory."""
@@ -78,10 +80,16 @@ def register_toil(
         ]
     )
 
-    install_cmd = (
-        f"source {virtualenvwrapper} && workon {env} && "
-        f"pip install {pypi_name}=={pypi_version} && which {pypi_name}"
-    )
+    if github_user:
+        install_cmd = (
+            f"source {virtualenvwrapper} && workon {env} && "
+            f"pip install git+https://github.com/{github_user}/{pypi_name}@{pypi_version}#egg={pypi_name} && which {pypi_name}"
+        )
+    else:
+        install_cmd = (
+            f"source {virtualenvwrapper} && workon {env} && "
+            f"pip install {pypi_name}=={pypi_version} && which {pypi_name}"
+        )
 
     click.echo(f"Installing package with '{install_cmd}'...")
     toolpath = subprocess.check_output(["/bin/bash", "-c", install_cmd])
@@ -177,11 +185,12 @@ def register_singularity(  # pylint: disable=R0913
 @click.command()
 @options.PYPI_NAME
 @options.PYPI_VERSION
+@options.GITHUB_USER
 @options.BINDIR
 @options.OPTDIR
 @options.PYTHON3
 @options.VERSION
-def register_python(pypi_name, pypi_version, bindir, optdir, python):
+def register_python(pypi_name, pypi_version, github_user, bindir, optdir, python):
     """Register versioned python pipelines in a bin directory."""
     virtualenvwrapper = shutil.which("virtualenvwrapper.sh")
     python = shutil.which(python)
@@ -209,10 +218,16 @@ def register_python(pypi_name, pypi_version, bindir, optdir, python):
         ]
     )
 
-    install_cmd = (
-        f"source {virtualenvwrapper} && workon {env} && "
-        f"pip install {pypi_name}=={pypi_version} && which {pypi_name}"
-    )
+    if github_user:
+        install_cmd = (
+            f"source {virtualenvwrapper} && workon {env} && "
+            f"pip install git+https://github.com/{github_user}/{pypi_name}@{pypi_version}#egg={pypi_name} && which {pypi_name}"
+        )
+    else:
+        install_cmd = (
+            f"source {virtualenvwrapper} && workon {env} && "
+            f"pip install {pypi_name}=={pypi_version} && which {pypi_name}"
+        )
 
     click.echo(f"Installing package with '{install_cmd}'...")
     toolpath = subprocess.check_output(["/bin/bash", "-c", install_cmd])

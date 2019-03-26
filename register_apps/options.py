@@ -38,6 +38,9 @@ IMAGE_URL = click.option(
     default=None,
     help="image URL [default=docker://{image_user}/{image_repository}:{image_version}]",
 )
+GITHUB_USER = click.option(
+    "--github_user", default=None, help="(optional) github user of package"
+)
 VOLUMES = click.option(
     "--volumes",
     type=click.Tuple([click.Path(exists=True, resolve_path=True, dir_okay=True), str]),

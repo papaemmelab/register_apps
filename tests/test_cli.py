@@ -109,19 +109,21 @@ def test_register_python(tmpdir):
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
     bindir = tmpdir.mkdir("bin")
-    optexe = optdir.join("click_annotvcf", "v1.0.7", "click_annotvcf")
-    binexe = bindir.join("click_annotvcf_v1.0.7")
+    optexe = optdir.join("toil_snapigv", "v0.1.1", "toil_snapigv")
+    binexe = bindir.join("toil_snapigv_v0.1.1")
     result = runner.invoke(
         cli.register_python,
         [
             "--pypi_name",
-            "click_annotvcf",
+            "toil_snapigv",
             "--pypi_version",
-            "v1.0.7",
+            "v0.1.1",
             "--optdir",
             optdir.strpath,
             "--bindir",
             bindir.strpath,
+            "--python",
+            "python2",
         ],
     )
 
@@ -129,7 +131,43 @@ def test_register_python(tmpdir):
         print(vars(result))
 
     for i in optexe.strpath, binexe.strpath:
-        assert b"1.0.7" in subprocess.check_output(
+        assert b"0.1.1" in subprocess.check_output(
             args=[i, "--version"], stderr=subprocess.STDOUT
         )
     assert not runner.invoke(cli.register_python, ["--help"]).exit_code
+
+
+def test_register_python_github(tmpdir):
+    """Sample test for register_python command."""
+    runner = CliRunner()
+    optdir = tmpdir.mkdir("opt")
+    bindir = tmpdir.mkdir("bin")
+    optexe = optdir.join("toil_snapigv", "v0.1.1", "toil_snapigv")
+    binexe = bindir.join("toil_snapigv_v0.1.1")
+    result = runner.invoke(
+        cli.register_python,
+        [
+            "--pypi_name",
+            "toil_snapigv",
+            "--pypi_version",
+            "v0.1.1",
+            "--optdir",
+            optdir.strpath,
+            "--bindir",
+            bindir.strpath,
+            "--github_user",
+            "papaemmelab",
+            "--python",
+            "python2",
+        ],
+    )
+
+    if result.exit_code:
+        print(vars(result))
+
+    for i in optexe.strpath, binexe.strpath:
+        assert b"0.1.1" in subprocess.check_output(
+            args=[i, "--version"], stderr=subprocess.STDOUT
+        )
+    assert not runner.invoke(cli.register_python, ["--help"]).exit_code
+
