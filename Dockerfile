@@ -16,6 +16,7 @@ RUN \
         python2.7 \
         python3.6 \
         uuid-runtime \
+        libarchive-dev \
     && apt-get clean \
     \
     # configure locale, see https://github.com/rocker-org/rocker/issues/19
@@ -27,7 +28,7 @@ RUN \
     && SOURCE=/tmp/singularity_source \
     && git clone https://github.com/singularityware/singularity.git $SOURCE \
     && cd $SOURCE \
-    && git checkout tags/2.4.5 \
+    && git checkout tags/2.6.1 \
     && ./autogen.sh \
     && ./configure \
     && make install \
