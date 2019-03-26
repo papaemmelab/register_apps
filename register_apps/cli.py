@@ -83,7 +83,8 @@ def register_toil(
     if github_user:
         install_cmd = (
             f"source {virtualenvwrapper} && workon {env} && "
-            f"pip install git+https://github.com/{github_user}/{pypi_name}@{pypi_version}#egg={pypi_name} && which {pypi_name}"
+            f"pip install git+https://github.com/{github_user}/"
+            f"{pypi_name}@{pypi_version}#egg={pypi_name} && which {pypi_name}"
         )
     else:
         install_cmd = (
@@ -221,7 +222,8 @@ def register_python(pypi_name, pypi_version, github_user, bindir, optdir, python
     if github_user:
         install_cmd = (
             f"source {virtualenvwrapper} && workon {env} && "
-            f"pip install git+https://github.com/{github_user}/{pypi_name}@{pypi_version}#egg={pypi_name} && which {pypi_name}"
+            f"pip install git+https://github.com/{github_user}/"
+            f"{pypi_name}@{pypi_version}#egg={pypi_name} && which {pypi_name}"
         )
     else:
         install_cmd = (
