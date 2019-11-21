@@ -1,4 +1,4 @@
-# register_apps
+# Register Apps
 
 [![pypi badge][pypi_badge]][pypi_base]
 [![travis badge][travis_badge]][travis_base]
