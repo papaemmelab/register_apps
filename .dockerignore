@@ -83,6 +83,7 @@ local_settings.py
 # Images
 *.simg
 *.img
+*.sif
 
 # Flask stuff:
 instance/
