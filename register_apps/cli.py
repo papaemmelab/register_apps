@@ -251,7 +251,9 @@ def register_python(pypi_name, pypi_version, github_user, bindir, optdir, python
 
 def _get_or_create_image(optdir, singularity, image_url):
     # pull image
-    singularity_images = list(optdir.glob("*.simg"))
+    singularity_images = []
+    for i in ["*.simg", "*.sif"]:
+        singularity_images += list(optdir.glob(i))
 
     assert (
         not singularity_images or len(singularity_images) == 1
@@ -266,6 +268,6 @@ def _get_or_create_image(optdir, singularity, image_url):
         )
 
     # fix singularity permissions
-    singularity_image = next(optdir.glob("*.simg"))
+    singularity_image = next(optdir.glob("*.simg"), next(optdir.glob("*.sif")))
     singularity_image.chmod(mode=0o755)
     return str(singularity_image)
