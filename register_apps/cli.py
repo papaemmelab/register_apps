@@ -38,7 +38,6 @@ from register_apps import utils
 @options.TMPVAR
 @options.VOLUMES
 @options.SINGULARITY
-@options.FORCE
 def register_toil(
     pypi_name,
     pypi_version,

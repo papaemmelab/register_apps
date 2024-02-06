@@ -20,7 +20,7 @@
         "pytest-runner==2.11.1"
     ],
     "install_requires": [
-        "click==6.7",
+        "click>=7.0.0",
         "virtualenvwrapper==4.8.2"
     ],
     "extras_require": {
