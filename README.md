@@ -14,6 +14,8 @@
 This package is available at [PyPi][pypi_base]:
 
     pip install register_apps
+    # or with the latest version
+    pip install git+https://github.com/papaemmelab/register_apps.git#egg=register_apps
 
 ## Usage
 
@@ -113,6 +115,16 @@ This package it's used to register versionized and containerized applications wi
         #!/bin/bash
         /path/to/.virtualenvs/production__click_annotvcf__v1.0.7/bin/click_annotvcf "$@"
 
+### Environment Variables
+
+Some default values can be set using environment variables:
+
+| Variable | Default value for | Description | Example |
+| --- | --- | --- | --- |
+| `REGISTER_APPS_BINDIR` | `--bindir` | Path to the directory where the executables symlinks will be created | i.e. `/apps/local/bin` |
+| `REGISTER_APPS_OPTDIR` | `--optdir` | Path to the directory where the containers and scripts will be installed | i.e. `/apps/opt` |
+| `REGISTER_APPS_TMPVAR` or `TMP_DIR` | `--tmpvar` | Path to the temporary directory | i.e. `/tmp` |
+| `REGISTER_APPS_VOLUMES` | `--volumes` | Comma-separated volumes in the format `{src}:{dst}` or just `{src}` | i.e. `/mnt/data,/scratch,/usr/local/data:/data` will mount in docker as `-v /mnt/data:/mnt/data -v /scratch:/scratch -v /usr/local/data:/data`.|
 
 ## Contributing
 

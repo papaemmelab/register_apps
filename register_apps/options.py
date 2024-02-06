@@ -7,10 +7,10 @@ from register_apps import __version__
 _DEFAULT_OPTDIR = "/work/isabl/local"
 _DEFAULT_BINDIR = "/work/isabl/bin"
 _DEFAULT_VOLUMES = (
-    ("/ifs", "/ifs"),
     ("/juno", "/juno"),
     ("/work", "/work"),
-    ("/res", "/res"),
+    ("/rtsess01", "/rtsess01"),
+    ("/data1", "/data1"),
 )
 
 VERSION = click.version_option(version=__version__)
@@ -30,7 +30,7 @@ IMAGE_VERSION = click.option(
 IMAGE_USER = click.option(
     "--image_user",
     default="papaemmelab",
-    help="docker hub user/organization name",
+    help="docker hub {user}/{organization} name",
     show_default=True,
 )
 IMAGE_URL = click.option(
@@ -53,21 +53,21 @@ TMPVAR = click.option(
     "--tmpvar",
     show_default=True,
     help="environment variable used for workdir: --workDir ${tmpvar}",
-    default="$TMP_DIR",
+    default=os.getenv("REGISTER_APP_TMPVAR", "TMP_DIR"),
 )
 BINDIR = click.option(
     "--bindir",
     show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
     help="path were executables will be linked to",
-    default=os.getenv("TOIL_REGISTER_BIN", _DEFAULT_BINDIR),
+    default=os.getenv("REGISTER_APP_BIN", _DEFAULT_BINDIR),
 )
 OPTDIR = click.option(
     "--optdir",
     show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
     help="path were images will be versioned and cached",
-    default=os.getenv("TOIL_REGISTER_OPT", _DEFAULT_OPTDIR),
+    default=os.getenv("REGISTER_APP_OPT", _DEFAULT_OPTDIR),
 )
 PYTHON2 = click.option(
     "--python",
