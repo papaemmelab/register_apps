@@ -53,21 +53,21 @@ TMPVAR = click.option(
     "--tmpvar",
     show_default=True,
     help="environment variable used for workdir: --workDir ${tmpvar}",
-    default=os.getenv("REGISTER_APP_TMPVAR", "TMP_DIR"),
+    default=os.getenv("REGISTER_APPS_TMPVAR", "TMP_DIR"),
 )
 BINDIR = click.option(
     "--bindir",
     show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
     help="path were executables will be linked to",
-    default=os.getenv("REGISTER_APP_BIN", _DEFAULT_BINDIR),
+    default=os.getenv("REGISTER_APPS_BIN", _DEFAULT_BINDIR),
 )
 OPTDIR = click.option(
     "--optdir",
     show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
     help="path were images will be versioned and cached",
-    default=os.getenv("REGISTER_APP_OPT", _DEFAULT_OPTDIR),
+    default=os.getenv("REGISTER_APPS_OPT", _DEFAULT_OPTDIR),
 )
 PYTHON2 = click.option(
     "--python",
