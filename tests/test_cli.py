@@ -80,15 +80,15 @@ def test_register_toil(tmpdir):
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
     bindir = tmpdir.mkdir("bin")
-    optexe = optdir.join("toil_disambiguate", "v0.1.2", "toil_disambiguate")
-    binexe = bindir.join("toil_disambiguate_v0.1.2")
+    optexe = optdir.join("toil_container", "v2.0.3", "toil_container")
+    binexe = bindir.join("toil_container_v2.0.3")
     result = runner.invoke(
         cli.register_toil,
         [
             "--pypi_name",
-            "toil_disambiguate",
+            "toil_container",
             "--pypi_version",
-            "v0.1.2",
+            "v2.0.3",
             "--image_user",
             "leukgen",
             "--volumes",
@@ -100,6 +100,8 @@ def test_register_toil(tmpdir):
             bindir.strpath,
             "--tmpvar",
             "$TMP",
+            "--python",
+            "python3",
         ],
     )
 
@@ -121,21 +123,21 @@ def test_register_python(tmpdir):
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
     bindir = tmpdir.mkdir("bin")
-    optexe = optdir.join("toil_snapigv", "v0.1.1", "toil_snapigv")
-    binexe = bindir.join("toil_snapigv_v0.1.1")
+    optexe = optdir.join("toil_container", "v2.0.3", "toil_container")
+    binexe = bindir.join("toil_container_v2.0.3")
     result = runner.invoke(
         cli.register_python,
         [
             "--pypi_name",
-            "toil_snapigv",
+            "toil_container",
             "--pypi_version",
-            "v0.1.1",
+            "v2.0.3",
             "--optdir",
             optdir.strpath,
             "--bindir",
             bindir.strpath,
             "--python",
-            "python2",
+            "python3",
         ],
     )
 
@@ -154,15 +156,15 @@ def test_register_python_github(tmpdir):
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
     bindir = tmpdir.mkdir("bin")
-    optexe = optdir.join("toil_snapigv", "v0.1.1", "toil_snapigv")
-    binexe = bindir.join("toil_snapigv_v0.1.1")
+    optexe = optdir.join("toil_container", "v2.0.3", "toil_container")
+    binexe = bindir.join("toil_container_v2.0.3")
     result = runner.invoke(
         cli.register_python,
         [
             "--pypi_name",
-            "toil_snapigv",
+            "toil_container",
             "--pypi_version",
-            "v0.1.1",
+            "v2.0.3",
             "--optdir",
             optdir.strpath,
             "--bindir",
@@ -170,7 +172,7 @@ def test_register_python_github(tmpdir):
             "--github_user",
             "papaemmelab",
             "--python",
-            "python2",
+            "python3",
         ],
     )
 

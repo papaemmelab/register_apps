@@ -168,6 +168,7 @@ def register_image(  # pylint: disable=R0913
             "--workdir",
             workdir,
             " ".join(f"--volume {i}:{j}" for i, j in volumes),
+            "--entrypoint ''" if command == "bash" else "",
             image_url,
             command,
             '"$@"\n',
