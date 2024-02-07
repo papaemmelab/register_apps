@@ -55,8 +55,8 @@ VOLUMES = click.option(
 TMPVAR = click.option(
     "--tmpvar",
     show_default=True,
-    help="environment variable used for workdir: --workDir ${tmpvar}. Use $REGISTER_APPS_TMPVAR",
-    default=os.getenv("REGISTER_APPS_TMPVAR", "TMP_DIR"),
+    help="environment variable used for workdir: --workDir ${tmpvar}. Use $REGISTER_APPS_TMPVAR or $TMP_DIR/$TMPDIR/$TMP.",
+    default=os.getenv("REGISTER_APPS_TMPVAR") or os.getenv("TMP_DIR") or os.getenv("TMPDIR") or os.getenv("TMP") or "/tmp",
 )
 BINDIR = click.option(
     "--bindir",

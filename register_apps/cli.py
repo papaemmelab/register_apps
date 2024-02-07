@@ -119,6 +119,7 @@ def register_toil(
 def register_image(  # pylint: disable=R0913
     bindir,
     command,
+    force,
     image_repository,
     image_type,
     image_url,
@@ -139,7 +140,7 @@ def register_image(  # pylint: disable=R0913
     workdir = f"{tmpvar}/${{USER}}_{image_repository}_{image_version}_`uuidgen`"
 
     # do not overwrite targets
-    if os.path.isfile(optexe) or os.path.isfile(binexe):  # pragma: no cover
+    if not force and (os.path.isfile(optexe) or os.path.isfile(binexe)):  # pragma: no cover
         raise click.UsageError(f"Targets exist, exiting...\n\t{optexe}\n\t{binexe}")
 
     # make sure dirs exist
@@ -195,6 +196,7 @@ def register_image(  # pylint: disable=R0913
 @options.TMPVAR
 @options.VOLUMES
 @options.SINGULARITY
+@options.FORCE
 @options.VERSION
 def register_singularity(singularity, *args, **kwargs):
     """Register versioned singularity command in a bin directory."""
@@ -213,6 +215,7 @@ def register_singularity(singularity, *args, **kwargs):
 @options.TMPVAR
 @options.VOLUMES
 @options.DOCKER
+@options.FORCE
 @options.VERSION
 def register_docker(docker, *args, **kwargs):
     """Register versioned docker command in a bin directory."""
