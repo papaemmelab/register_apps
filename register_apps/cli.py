@@ -116,6 +116,71 @@ def register_toil(
         fg="green",
     )
 
+def register_image(  # pylint: disable=R0913
+    bindir,
+    command,
+    image_repository,
+    image_type,
+    image_url,
+    image_user,
+    image_version,
+    optdir,
+    runtime,
+    target,
+    tmpvar,
+    volumes,
+):
+    optdir = Path(optdir) / image_repository / image_version
+    bindir = Path(bindir)
+    optexe = optdir / target
+    binexe = bindir / target
+    image_source  = "docker://" if image_type == "singularity" else ""
+    image_url = image_url or f"{image_source}{image_user}/{image_repository}:{image_version}"
+    workdir = f"{tmpvar}/${{USER}}_{image_repository}_{image_version}_`uuidgen`",
+
+    # do not overwrite targets
+    if os.path.isfile(optexe) or os.path.isfile(binexe):  # pragma: no cover
+        raise click.UsageError(f"Targets exist, exiting...\n\t{optexe}\n\t{binexe}")
+
+    # make sure dirs exist
+    optdir.mkdir(exist_ok=True, parents=True)
+    bindir.mkdir(exist_ok=True, parents=True)
+
+    # build command
+    if image_type == "singularity":
+        command = [
+            runtime,
+            "exec",
+            "--workdir",
+            workdir,
+            " ".join(f"--bind {i}:{j}" for i, j in volumes),
+            _get_or_create_image(optdir, runtime, image_url),
+            command,
+            '"$@"\n',
+        ]
+    else: # image_type == "docker"
+        command = [
+            runtime,
+            "run",
+            "-it"
+            "--rm",
+            "--workdir",
+            workdir,
+            " ".join(f"--volume {i}:{j}" for i, j in volumes),
+            image_url,
+            command,
+            '"$@"\n',
+        ]
+
+    # link executables
+    click.echo("Creating and linking executable...")
+    optexe.write_text(f"#!/bin/bash\n{' '.join(command)}")
+    optexe.chmod(mode=0o755)
+    utils.force_symlink(optexe, binexe)
+    click.secho(
+        f"\nExecutables available at:\n" f"\n\t{str(optexe)}" f"\n\t{str(binexe)}\n",
+        fg="green",
+    )
 
 @click.command()
 @options.TARGET
@@ -130,55 +195,26 @@ def register_toil(
 @options.VOLUMES
 @options.SINGULARITY
 @options.VERSION
-def register_singularity(  # pylint: disable=R0913
-    bindir,
-    command,
-    image_repository,
-    image_url,
-    image_user,
-    image_version,
-    optdir,
-    singularity,
-    target,
-    tmpvar,
-    volumes,
-):
+def register_singularity(singularity, *args, **kwargs):
     """Register versioned singularity command in a bin directory."""
-    optdir = Path(optdir) / image_repository / image_version
-    bindir = Path(bindir)
-    optexe = optdir / target
-    binexe = bindir / target
-    image_url = image_url or f"docker://{image_user}/{image_repository}:{image_version}"
+    register_image(image_type="singularity", runtime=singularity, *args, **kwargs)
 
-    # do not overwrite targets
-    if os.path.isfile(optexe) or os.path.isfile(binexe):  # pragma: no cover
-        raise click.UsageError(f"Targets exist, exiting...\n\t{optexe}\n\t{binexe}")
-
-    # make sure dirs exist
-    optdir.mkdir(exist_ok=True, parents=True)
-    bindir.mkdir(exist_ok=True, parents=True)
-
-    # build command
-    command = [
-        singularity,
-        "exec",
-        "--workdir",
-        f"{tmpvar}/${{USER}}_{image_repository}_{image_version}_`uuidgen`",
-        " ".join(f"--bind {i}:{j}" for i, j in volumes),
-        _get_or_create_image(optdir, singularity, image_url),
-        command,
-        '"$@"\n',
-    ]
-
-    # link executables
-    click.echo("Creating and linking executable...")
-    optexe.write_text(f"#!/bin/bash\n{' '.join(command)}")
-    optexe.chmod(mode=0o755)
-    utils.force_symlink(optexe, binexe)
-    click.secho(
-        f"\nExecutables available at:\n" f"\n\t{str(optexe)}" f"\n\t{str(binexe)}\n",
-        fg="green",
-    )
+@click.command()
+@options.TARGET
+@options.COMMAND
+@options.IMAGE_REPOSITORY
+@options.IMAGE_USER
+@options.IMAGE_VERSION
+@options.IMAGE_URL
+@options.BINDIR
+@options.OPTDIR
+@options.TMPVAR
+@options.VOLUMES
+@options.DOCKER
+@options.VERSION
+def register_docker(docker, *args, **kwargs):
+    """Register versioned docker command in a bin directory."""
+    register_image(image_type="docker", runtime=docker, *args, **kwargs)
 
 
 @click.command()
@@ -248,7 +284,7 @@ def register_python(pypi_name, pypi_version, github_user, bindir, optdir, python
 
 
 def _get_or_create_image(optdir, singularity, image_url):
-    # pull image
+    """Pull image if it's not locally available and store it."""
     singularity_images = []
     for i in ["*.simg", "*.sif"]:
         singularity_images += list(optdir.glob(i))

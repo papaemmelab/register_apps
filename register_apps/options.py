@@ -6,12 +6,15 @@ from register_apps import __version__
 
 _DEFAULT_OPTDIR = "/work/isabl/local"
 _DEFAULT_BINDIR = "/work/isabl/bin"
-_DEFAULT_VOLUMES = (
-    ("/juno", "/juno"),
-    ("/work", "/work"),
-    ("/rtsess01", "/rtsess01"),
-    ("/data1", "/data1"),
-)
+
+def get_default_volumes():
+    volumes = []
+    for vol in os.getenv("REGISTER_APPS_VOLUMES", "").split(","):
+        if ":" in vol:
+            volumes.append(vol.split(":"))
+        else:
+            volumes.append((vol, vol))
+    return volumes or [("/data1", "/data1")]
 
 VERSION = click.version_option(version=__version__)
 
@@ -45,28 +48,28 @@ VOLUMES = click.option(
     "--volumes",
     type=click.Tuple([click.Path(exists=True, resolve_path=True, dir_okay=True), str]),
     multiple=True,
-    default=_DEFAULT_VOLUMES,
+    default=get_default_volumes(),
     show_default=False,
-    help=f"volumes tuples to be passed to singularity. Use \$REGISTER_APPS_VOLUMES [default={_DEFAULT_VOLUMES}]",
+    help=f"volumes tuples to be passed to the container command. Use $REGISTER_APPS_VOLUMES. [default={get_default_volumes()}]",
 )
 TMPVAR = click.option(
     "--tmpvar",
     show_default=True,
-    help="environment variable used for workdir: --workDir ${tmpvar}. Use \$REGISTER_APPS_TMPVAR",
+    help="environment variable used for workdir: --workDir ${tmpvar}. Use $REGISTER_APPS_TMPVAR",
     default=os.getenv("REGISTER_APPS_TMPVAR", "TMP_DIR"),
 )
 BINDIR = click.option(
     "--bindir",
     show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
-    help="path were executables will be linked to. Use \$REGISTER_APPS_BIN",
+    help="path were executables will be linked to. Use $REGISTER_APPS_BIN",
     default=os.getenv("REGISTER_APPS_BIN", _DEFAULT_BINDIR),
 )
 OPTDIR = click.option(
     "--optdir",
     show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
-    help="path were images will be versioned and cached. Use \$REGISTER_APPS_OPT",
+    help="path were images will be versioned and cached. Use $REGISTER_APPS_OPT",
     default=os.getenv("REGISTER_APPS_OPT", _DEFAULT_OPTDIR),
 )
 PYTHON2 = click.option(
@@ -81,10 +84,16 @@ PYTHON3 = click.option(
     help="which python to be used for the virtual environment",
     default="python3",
 )
+DOCKER = click.option(
+    "--docker",
+    show_default=True,
+    help="path to docker runtime",
+    default="docker",
+)
 SINGULARITY = click.option(
     "--singularity",
     show_default=True,
-    help="path to singularity",
+    help="path to singularity runtime",
     default="singularity",
 )
 TARGET = click.option(
@@ -99,4 +108,10 @@ COMMAND = click.option(
     required=True,
     help="command that will be added at the end of the singularity exec instruction "
     "(e.g. bwa_mem.pl)",
+)
+FORCE = click.option(
+    "--force",
+    is_flag=True,
+    required=False,
+    help="Overwrite target executable and scripts (and images) if they already exist",
 )
