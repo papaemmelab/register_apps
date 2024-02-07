@@ -25,15 +25,7 @@ import click
 from register_apps import options
 from register_apps import utils
 
-EPILOG_MSG = """
-Set env vars to set defaults: 
-  - REGISTER_APPS_BIN for --bindir
-  - REGISTER_APPS_OPT for --optdir
-  - REGISTER_APPS_VOLUMES for --volumes
-  - REGISTER_APPS_TMPVAR for --tmpvar
-"""
-
-@click.command(epilog=EPILOG_MSG)
+@click.command()
 @options.PYPI_NAME
 @options.PYPI_VERSION
 @options.IMAGE_USER
@@ -125,7 +117,7 @@ def register_toil(
     )
 
 
-@click.command(epilog=EPILOG_MSG)
+@click.command()
 @options.TARGET
 @options.COMMAND
 @options.IMAGE_REPOSITORY
@@ -189,7 +181,7 @@ def register_singularity(  # pylint: disable=R0913
     )
 
 
-@click.command(epilog=EPILOG_MSG)
+@click.command()
 @options.PYPI_NAME
 @options.PYPI_VERSION
 @options.GITHUB_USER

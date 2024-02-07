@@ -47,26 +47,26 @@ VOLUMES = click.option(
     multiple=True,
     default=_DEFAULT_VOLUMES,
     show_default=False,
-    help=f"volumes tuples to be passed to singularity [default={_DEFAULT_VOLUMES}]",
+    help=f"volumes tuples to be passed to singularity. Use \$REGISTER_APPS_VOLUMES [default={_DEFAULT_VOLUMES}]",
 )
 TMPVAR = click.option(
     "--tmpvar",
     show_default=True,
-    help="environment variable used for workdir: --workDir ${tmpvar}",
+    help="environment variable used for workdir: --workDir ${tmpvar}. Use \$REGISTER_APPS_TMPVAR",
     default=os.getenv("REGISTER_APPS_TMPVAR", "TMP_DIR"),
 )
 BINDIR = click.option(
     "--bindir",
     show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
-    help="path were executables will be linked to",
+    help="path were executables will be linked to. Use \$REGISTER_APPS_BIN",
     default=os.getenv("REGISTER_APPS_BIN", _DEFAULT_BINDIR),
 )
 OPTDIR = click.option(
     "--optdir",
     show_default=True,
     type=click.Path(resolve_path=True, dir_okay=True),
-    help="path were images will be versioned and cached",
+    help="path were images will be versioned and cached. Use \$REGISTER_APPS_OPT",
     default=os.getenv("REGISTER_APPS_OPT", _DEFAULT_OPTDIR),
 )
 PYTHON2 = click.option(
