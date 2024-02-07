@@ -302,13 +302,14 @@ def _get_or_create_image(optdir, singularity, image_url):
 
     if singularity_images:
         click.echo(f"Image exists at: {singularity_images[0]}")
+        singularity_image = singularity_images[0]
     else:
         subprocess.check_call(
             ["/bin/bash", "-c", f"umask 22 && {singularity} pull {image_url}"],
             cwd=optdir,
         )
+        singularity_image = next(optdir.glob("*.sif"), next(optdir.glob("*.simg")))
 
     # fix singularity permissions
-    singularity_image = next(optdir.glob("*.simg"), next(optdir.glob("*.sif")))
     singularity_image.chmod(mode=0o755)
     return str(singularity_image)
