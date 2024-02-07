@@ -136,7 +136,7 @@ def register_image(  # pylint: disable=R0913
     binexe = bindir / target
     image_source  = "docker://" if image_type == "singularity" else ""
     image_url = image_url or f"{image_source}{image_user}/{image_repository}:{image_version}"
-    workdir = f"{tmpvar}/${{USER}}_{image_repository}_{image_version}_`uuidgen`",
+    workdir = f"{tmpvar}/${{USER}}_{image_repository}_{image_version}_`uuidgen`"
 
     # do not overwrite targets
     if os.path.isfile(optexe) or os.path.isfile(binexe):  # pragma: no cover
@@ -162,7 +162,7 @@ def register_image(  # pylint: disable=R0913
         command = [
             runtime,
             "run",
-            "-it"
+            "-it",
             "--rm",
             "--workdir",
             workdir,

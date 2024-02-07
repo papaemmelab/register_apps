@@ -17,7 +17,7 @@ SKIP_DOCKER = pytest.mark.skipif(
     not utils.is_executable_available("docker"), reason="docker is not available."
 )
 
-def test_register_container(tmpdir, container_runtime):
+def run_register_container(tmpdir, container_runtime):
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
     bindir = tmpdir.mkdir("bin")
@@ -25,31 +25,28 @@ def test_register_container(tmpdir, container_runtime):
     binexe = bindir.join("bwa_mem.pl")
     container_cli = cli.register_docker if container_runtime == "docker" else cli.register_singularity 
 
-    result = runner.invoke(
-        container_cli,
-        [
-            "--image_repository",
-            "docker-pcapcore",
-            "--image_version",
-            "v0.1.1",
-            "--image_user",
-            "leukgen",
-            "--volumes",
-            "/tmp",
-            "/carlos",
-            "--optdir",
-            optdir.strpath,
-            "--bindir",
-            bindir.strpath,
-            "--tmpvar",
-            "$TMP",
-            "--command",
-            "bwa_mem.pl",
-            "--target",
-            "bwa_mem.pl",
-        ],
-    )
-
+    args = [
+        "--image_repository",
+        "docker-pcapcore",
+        "--image_version",
+        "v0.1.1",
+        "--image_user",
+        "leukgen",
+        "--volumes",
+        "/tmp",
+        "/carlos",
+        "--optdir",
+        optdir.strpath,
+        "--bindir",
+        bindir.strpath,
+        "--tmpvar",
+        "$TMPDIR",
+        "--command",
+        "bwa_mem.pl",
+        "--target",
+        "bwa_mem.pl",
+    ]
+    result = runner.invoke(container_cli, args)
     if result.exit_code:
         print(vars(result))
 
@@ -68,13 +65,13 @@ def test_register_container(tmpdir, container_runtime):
 @SKIP_DOCKER
 def test_register_docker(tmpdir):
     """Sample test for register_docker command."""
-    test_register_container(tmpdir, container_runtime="docker")
+    run_register_container(tmpdir, container_runtime="docker")
 
 
 @SKIP_SINGULARITY
 def test_register_singularity(tmpdir):
     """Sample test for register_singularity command."""
-    test_register_container(tmpdir, container_runtime="singularity")
+    run_register_container(tmpdir, container_runtime="singularity")
 
 
 @SKIP_SINGULARITY
