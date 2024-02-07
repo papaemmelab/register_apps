@@ -294,12 +294,11 @@ def register_python(pypi_name, pypi_version, github_user, bindir, optdir, python
 def _get_or_create_image(optdir, singularity, image_url):
     """Pull image if it's not locally available and store it."""
     singularity_images = []
-    for i in ["*.simg", "*.sif"]:
+    for i in ["*.sif", "*.simg"]:
         singularity_images += list(optdir.glob(i))
 
-    assert (
-        not singularity_images or len(singularity_images) == 1
-    ), f"Found multiple images at {optdir}"
+    if len(singularity_images) > 1:
+        click.echo(f"Found multiple images at {optdir}. Using {singularity_images[0]}.")
 
     if singularity_images:
         click.echo(f"Image exists at: {singularity_images[0]}")
