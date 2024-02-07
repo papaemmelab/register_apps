@@ -10,8 +10,71 @@ from tests import utils
 
 
 SKIP_SINGULARITY = pytest.mark.skipif(
-    not utils.is_singularity_available(), reason="singularity is not available."
+    not utils.is_executable_available("singularity"), reason="singularity is not available."
 )
+
+SKIP_DOCKER = pytest.mark.skipif(
+    not utils.is_executable_available("docker"), reason="docker is not available."
+)
+
+def test_register_container(tmpdir, container_runtime):
+    runner = CliRunner()
+    optdir = tmpdir.mkdir("opt")
+    bindir = tmpdir.mkdir("bin")
+    optexe = optdir.join("docker-pcapcore", "v0.1.1", "bwa_mem.pl")
+    binexe = bindir.join("bwa_mem.pl")
+    container_cli = cli.register_docker if container_runtime == "docker" else cli.register_singularity 
+
+    result = runner.invoke(
+        container_cli,
+        [
+            "--image_repository",
+            "docker-pcapcore",
+            "--image_version",
+            "v0.1.1",
+            "--image_user",
+            "leukgen",
+            "--volumes",
+            "/tmp",
+            "/carlos",
+            "--optdir",
+            optdir.strpath,
+            "--bindir",
+            bindir.strpath,
+            "--tmpvar",
+            "$TMP",
+            "--command",
+            "bwa_mem.pl",
+            "--target",
+            "bwa_mem.pl",
+        ],
+    )
+
+    if result.exit_code:
+        print(vars(result))
+
+    for i in optexe.strpath, binexe.strpath:
+        assert b"4.2.1" in subprocess.check_output(
+            args=[i, "--version"],
+            env={"TMP": "/tmp", "USER": "root"},
+            stderr=subprocess.STDOUT,
+        )
+
+    assert "--volume /tmp:/carlos" if container_runtime == "docker" else "--bind /tmp:/carlos" in optexe.read()
+    assert "--workdir $TMP" in optexe.read()
+    assert not runner.invoke(container_cli, ["--help"]).exit_code
+
+
+@SKIP_DOCKER
+def test_register_docker(tmpdir):
+    """Sample test for register_docker command."""
+    test_register_container(tmpdir, container_runtime="docker")
+
+
+@SKIP_SINGULARITY
+def test_register_singularity(tmpdir):
+    """Sample test for register_singularity command."""
+    test_register_container(tmpdir, container_runtime="singularity")
 
 
 @SKIP_SINGULARITY
@@ -54,54 +117,6 @@ def test_register_toil(tmpdir):
     assert "--volumes /tmp /carlos" in optexe.read()
     assert "--workDir $TMP" in optexe.read()
     assert not runner.invoke(cli.register_toil, ["--help"]).exit_code
-
-
-@SKIP_SINGULARITY
-def test_register_singularity(tmpdir):
-    """Sample test for register_singularity command."""
-    runner = CliRunner()
-    optdir = tmpdir.mkdir("opt")
-    bindir = tmpdir.mkdir("bin")
-    optexe = optdir.join("docker-pcapcore", "v0.1.1", "bwa_mem.pl")
-    binexe = bindir.join("bwa_mem.pl")
-    result = runner.invoke(
-        cli.register_singularity,
-        [
-            "--image_repository",
-            "docker-pcapcore",
-            "--image_version",
-            "v0.1.1",
-            "--image_user",
-            "leukgen",
-            "--volumes",
-            "/tmp",
-            "/carlos",
-            "--optdir",
-            optdir.strpath,
-            "--bindir",
-            bindir.strpath,
-            "--tmpvar",
-            "$TMP",
-            "--command",
-            "bwa_mem.pl",
-            "--target",
-            "bwa_mem.pl",
-        ],
-    )
-
-    if result.exit_code:
-        print(vars(result))
-
-    for i in optexe.strpath, binexe.strpath:
-        assert b"4.2.1" in subprocess.check_output(
-            args=[i, "--version"],
-            env={"TMP": "/tmp", "USER": "root"},
-            stderr=subprocess.STDOUT,
-        )
-
-    assert "--bind /tmp:/carlos" in optexe.read()
-    assert "--workdir $TMP" in optexe.read()
-    assert not runner.invoke(cli.register_singularity, ["--help"]).exit_code
 
 
 def test_register_python(tmpdir):

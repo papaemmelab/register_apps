@@ -3,15 +3,18 @@
 import subprocess
 
 
-def is_singularity_available():
+def is_executable_available(executable):
     """
-    Check if singularity is available to run in the current environment.
+    Check if an executable is available to run in the current environment.
+
+    Args:
+        executable (str): name of the executable to check.
 
     Returns:
-        bool: True if singularity is available.
+        bool: True if the executable is available.
     """
     try:
-        subprocess.check_output(["singularity", "--version"])
+        subprocess.check_output([executable, "--version"])
         return True
     except (subprocess.CalledProcessError, OSError):
         return False

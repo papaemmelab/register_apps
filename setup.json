@@ -11,9 +11,10 @@
     ],
     "entry_points": {
         "console_scripts": [
-            "register_toil=register_apps.cli:register_toil",
+            "register_docker=register_apps.cli:register_docker",
+            "register_python=register_apps.cli:register_python",
             "register_singularity=register_apps.cli:register_singularity",
-            "register_python=register_apps.cli:register_python"
+            "register_toil=register_apps.cli:register_toil"
         ]
     },
     "setup_requires": [

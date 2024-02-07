@@ -182,6 +182,7 @@ def register_image(  # pylint: disable=R0913
         fg="green",
     )
 
+
 @click.command()
 @options.TARGET
 @options.COMMAND
@@ -198,6 +199,7 @@ def register_image(  # pylint: disable=R0913
 def register_singularity(singularity, *args, **kwargs):
     """Register versioned singularity command in a bin directory."""
     register_image(image_type="singularity", runtime=singularity, *args, **kwargs)
+
 
 @click.command()
 @options.TARGET
