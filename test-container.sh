@@ -12,7 +12,7 @@ if [ "$1" = "--skip-build" ]; then
     echo "skipping build..."
 else
     echo "building image, to skip run with --skip-build..."
-    docker build -q -t $TEST_IMAGE .
+    docker build -t $TEST_IMAGE .
 fi
 
 # see https://explainshell.com/explain?cmd=set+-euxo%20pipefail
@@ -24,7 +24,7 @@ find . -name '*.pyc' -exec rm {} +
 find . -name '__pycache__' -exec rm -rf {} +
 
 # run tox inside the container
-docker run --rm $TEST_IMAGE --version
+docker run --rm $TEST_IMAGE --help
 docker run -it --privileged --rm --entrypoint "" -v `pwd`:/test -w /test \
     $TEST_IMAGE bash -c "cp -r /test /register_apps && cd /register_apps && pip install tox && tox && cp .coverage /test"
 
