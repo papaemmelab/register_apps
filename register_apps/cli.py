@@ -165,6 +165,8 @@ def register_image(  # pylint: disable=R0913
             "run",
             "-it",
             "--rm",
+            "-u",
+            "$(id -u):$(id -g)",
             "--workdir",
             workdir,
             " ".join(f"--volume {i}:{j}" for i, j in volumes),
