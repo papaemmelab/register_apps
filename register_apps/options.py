@@ -84,6 +84,12 @@ PYTHON3 = click.option(
     help="which python to be used for the virtual environment",
     default="python3",
 )
+VIRTUALENVWRAPPER = click.option(
+    "--virtualenvwrapper",
+    show_default=True,
+    help="path to virtualenvwrapper.sh",
+    default="virtualenvwrapper.sh",
+)
 DOCKER = click.option(
     "--docker",
     show_default=True,

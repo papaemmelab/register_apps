@@ -233,9 +233,10 @@ def register_docker(docker, *args, **kwargs):
 @options.OPTDIR
 @options.PYTHON3
 @options.VERSION
-def register_python(pypi_name, pypi_version, github_user, bindir, optdir, python):
+@options.VIRTUALENVWRAPPER
+def register_python(pypi_name, pypi_version, github_user, bindir, optdir, python, virtualenvwrapper):
     """Register versioned python pipelines in a bin directory."""
-    virtualenvwrapper = shutil.which("virtualenvwrapper.sh")
+    virtualenvwrapper = shutil.which(virtualenvwrapper)
     python = shutil.which(python)
     optdir = Path(optdir) / pypi_name / pypi_version
     bindir = Path(bindir)
