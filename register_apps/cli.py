@@ -37,6 +37,8 @@ from register_apps import utils
 @options.TMPVAR
 @options.VOLUMES
 @options.SINGULARITY
+@options.VIRTUALENVWRAPPER
+@options.CONTAINER
 def register_toil(
     pypi_name,
     pypi_version,
@@ -49,9 +51,11 @@ def register_toil(
     image_user,
     github_user,
     singularity,
+    virtualenvwrapper,
+    container,
 ):
     """Register versioned toil container pipelines in a bin directory."""
-    virtualenvwrapper = shutil.which("virtualenvwrapper.sh")
+    virtualenvwrapper = shutil.which(virtualenvwrapper)
     python = shutil.which(python)
     optdir = Path(optdir) / pypi_name / pypi_version
     bindir = Path(bindir)
@@ -98,8 +102,20 @@ def register_toil(
     command = [
         toolpath,
         '"$@"',
-        "--singularity",
-        _get_or_create_image(optdir, singularity, image_url),
+    ]
+
+    if container == "singularity":
+        command += [
+            "--singularity",
+            _get_or_create_image(optdir, singularity, image_url),
+        ]
+    else: # container == "docker"
+        command += [
+            "--docker",
+            image_url,
+        ]
+
+    command += [
         " ".join(f"--volumes {i} {j}" for i, j in volumes),
         "--workDir",
         tmpvar,

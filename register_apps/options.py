@@ -121,3 +121,10 @@ FORCE = click.option(
     required=False,
     help="Overwrite target executable and scripts (and images) if they already exist",
 )
+CONTAINER = click.option(
+    "--container",
+    show_default=True,
+    default="singularity",
+    type=click.Choice(["docker", "singularity"]),
+    help="container runtime to be used (docker or singularity)",
+)
