@@ -63,6 +63,9 @@ def register_toil(
     binexe = bindir / f"{pypi_name}_{pypi_version}"
     image_url = image_url or f"docker://{image_user}/{pypi_name}:{pypi_version}"
 
+    if container == "singularity":
+        image_url = f"docker://{image_url}"
+
     # check paths
     assert python, "Could not determine the python path."
     assert virtualenvwrapper, "Could not determine the virtualenvwrapper.sh path."
@@ -147,6 +150,8 @@ def register_image(  # pylint: disable=R0913
     tmpvar,
     volumes,
 ):
+    if image_type == "singularity":
+        image_url = f"docker://{image_url}"
     optdir = Path(optdir) / image_repository / image_version
     bindir = Path(bindir)
     optexe = optdir / target
