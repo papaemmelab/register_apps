@@ -61,10 +61,10 @@ def register_toil(
     bindir = Path(bindir)
     optexe = optdir / pypi_name
     binexe = bindir / f"{pypi_name}_{pypi_version}"
-    image_url = image_url or f"docker://{image_user}/{pypi_name}:{pypi_version}"
-
-    if container == "singularity":
+    
+    if container == "singularity" and image_url:
         image_url = f"docker://{image_url}"
+    image_url = image_url or f"docker://{image_user}/{pypi_name}:{pypi_version}"
 
     # check paths
     assert python, "Could not determine the python path."
