@@ -19,6 +19,7 @@ from pathlib import Path
 import os
 import shutil
 import subprocess
+import time
 
 import click
 
@@ -62,7 +63,7 @@ def register_toil(
     optexe = optdir / pypi_name
     binexe = bindir / f"{pypi_name}_{pypi_version}"
     
-    if container == "singularity" and image_url:
+    if image_url and container == "singularity":
         image_url = f"docker://{image_url}"
     image_url = image_url or f"docker://{image_user}/{pypi_name}:{pypi_version}"
 
@@ -150,15 +151,15 @@ def register_image(  # pylint: disable=R0913
     tmpvar,
     volumes,
 ):
-    if image_type == "singularity":
-        image_url = f"docker://{image_url}"
     optdir = Path(optdir) / image_repository / image_version
     bindir = Path(bindir)
     optexe = optdir / target
     binexe = bindir / target
-    image_source  = "docker://" if image_type == "singularity" else ""
-    image_url = image_url or f"{image_source}{image_user}/{image_repository}:{image_version}"
     workdir = f"{tmpvar}/${{USER}}_{image_repository}_{image_version}_`uuidgen`"
+    
+    image_url = image_url or f"{image_user}/{image_repository}:{image_version}"
+    if image_type == "singularity":
+        image_url = f"docker://{image_url}"
 
     # do not overwrite targets
     if not force and (os.path.isfile(optexe) or os.path.isfile(binexe)):  # pragma: no cover
@@ -330,6 +331,7 @@ def _get_or_create_image(optdir, singularity, image_url):
             ["/bin/bash", "-c", f"umask 22 && {singularity} pull {image_url}"],
             cwd=optdir,
         )
+        time.sleep(1) # wait for singularity to finish
         singularity_image = next(optdir.glob("*.sif"), next(optdir.glob("*.simg")))
 
     # fix singularity permissions
