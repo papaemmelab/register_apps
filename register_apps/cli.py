@@ -158,8 +158,10 @@ def register_image(  # pylint: disable=R0913
     workdir = f"{tmpvar}/${{USER}}_{image_repository}_{image_version}_`uuidgen`"
     
     image_url = image_url or f"{image_user}/{image_repository}:{image_version}"
-    if image_type == "singularity":
+    if image_type == "singularity" and not image_url.startswith("docker://"):
         image_url = f"docker://{image_url}"
+    if image_type == "docker" and image_url.startswith("docker://"):
+        image_url = image_url.replace("docker://", "")
 
     # do not overwrite targets
     if not force and (os.path.isfile(optexe) or os.path.isfile(binexe)):  # pragma: no cover
