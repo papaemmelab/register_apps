@@ -318,8 +318,9 @@ def register_python(pypi_name, pypi_version, github_user, bindir, optdir, python
 
 def get_singularity_image_with_timeout(optdir):
     """Try to get the singularity image file from the optdir."""
-    timeout = 60  # timeout after 60 seconds
+    timeout = 10  # timeout after 60 seconds
     start_time = time.time()
+    click.echo(f"Looking for newly created Singularity image in {optdir}")
     while True:
         try:
             singularity_image = next(optdir.glob("*.sif"), next(optdir.glob("*.simg")))
@@ -345,10 +346,11 @@ def _get_or_create_image(optdir, singularity, image_url):
         click.echo(f"Image exists at: {singularity_images[0]}")
         singularity_image = singularity_images[0]
     else:
-        subprocess.check_call(
+        process = subprocess.Popen(
             ["/bin/bash", "-c", f"umask 22 && {singularity} pull {image_url}"],
             cwd=optdir,
         )
+        process.communicate()
         singularity_image = get_singularity_image_with_timeout(optdir)
 
     # fix singularity permissions
