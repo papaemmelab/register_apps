@@ -316,6 +316,24 @@ def register_python(pypi_name, pypi_version, github_user, bindir, optdir, python
     )
 
 
+def get_singularity_image_with_timeout(optdir):
+    """Try to get the singularity image file from the optdir."""
+    timeout = 10  # timeout after 60 seconds
+    start_time = time.time()
+
+    while True:
+        try:
+            singularity_image = next(optdir.glob("*.sif"), next(optdir.glob("*.simg")))
+            break
+        except StopIteration:
+            if time.time() - start_time > timeout:
+                raise Exception(f"Timeout while waiting for Singularity image file in {optdir}")
+            else:
+                time.sleep(1)  # wait for 1 second before trying again
+
+    return singularity_image
+
+
 def _get_or_create_image(optdir, singularity, image_url):
     """Pull image if it's not locally available and store it."""
     singularity_images = []
@@ -333,8 +351,7 @@ def _get_or_create_image(optdir, singularity, image_url):
             ["/bin/bash", "-c", f"umask 22 && {singularity} pull {image_url}"],
             cwd=optdir,
         )
-        time.sleep(1) # wait for singularity to finish
-        singularity_image = next(optdir.glob("*.sif"), next(optdir.glob("*.simg")))
+        singularity_image = get_singularity_image_with_timeout(optdir)
 
     # fix singularity permissions
     singularity_image.chmod(mode=0o755)
