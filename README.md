@@ -7,7 +7,7 @@
 [![docker badge][automated_badge]][docker_base]
 [![code formatting][black_badge]][black_base]
 
-👾 Register versioned [toil container] pipelines, singularity containers, and python packages.
+👾 Register versioned [toil container] pipelines, [singularity] containers, and python packages.
 
 ## Installation
 
@@ -123,7 +123,6 @@ Some default values can be set using environment variables:
 | --- | --- | --- | --- |
 | `REGISTER_APPS_BIN` | `--bindir` | Path to the directory where the executables symlinks will be created | i.e. `/apps/local/bin` |
 | `REGISTER_APPS_OPT` | `--optdir` | Path to the directory where the containers and scripts will be installed | i.e. `/apps/opt` |
-| `REGISTER_APPS_TMPVAR` or `TMP_DIR` | `--tmpvar` | Path to the temporary directory | i.e. `/tmp` |
 | `REGISTER_APPS_VOLUMES` | `--volumes` | Comma-separated volumes in the format `{src}:{dst}` or just `{src}` | i.e. `/mnt/data,/scratch,/usr/local/data:/data` will mount in docker as `-v /mnt/data:/mnt/data -v /scratch:/scratch -v /usr/local/data:/data`.|
 
 ## Contributing
@@ -138,7 +137,6 @@ This package was created using [Cookiecutter] and the
 [virtual environments]: http://virtualenvwrapper.readthedocs.io/en/latest/
 [toil container]: https://github.com/papaemmelab/toil_container
 [singularity]: http://singularity.lbl.gov/
-[docker2singularity]: https://github.com/singularityware/docker2singularity
 [cookiecutter]: https://github.com/audreyr/cookiecutter
 [papaemmelab/cookiecutter-toil]: https://github.com/papaemmelab/cookiecutter-toil
 [`--batchSystem`]: http://toil.readthedocs.io/en/latest/developingWorkflows/batchSystem.html?highlight=BatchSystem
