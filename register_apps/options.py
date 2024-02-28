@@ -53,7 +53,7 @@ TMPVAR = click.option(
     "--tmpvar",
     show_default=True,
     help="environment variable used for workdir: --workDir ${tmpvar}",
-    default="$TMP_DIR",
+    default="${TMP_DIR}",
 )
 BINDIR = click.option(
     "--bindir",
