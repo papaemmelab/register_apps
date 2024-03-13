@@ -10,8 +10,68 @@ from tests import utils
 
 
 SKIP_SINGULARITY = pytest.mark.skipif(
-    not utils.is_singularity_available(), reason="singularity is not available."
+    not utils.is_executable_available("singularity"), reason="singularity is not available."
 )
+
+SKIP_DOCKER = pytest.mark.skipif(
+    not utils.is_executable_available("docker"), reason="docker is not available."
+)
+
+def run_register_container(tmpdir, container_runtime):
+    runner = CliRunner()
+    optdir = tmpdir.mkdir("opt")
+    bindir = tmpdir.mkdir("bin")
+    optexe = optdir.join("docker-pcapcore", "v0.1.1", "bwa_mem.pl")
+    binexe = bindir.join("bwa_mem.pl")
+    container_cli = cli.register_docker if container_runtime == "docker" else cli.register_singularity 
+
+    args = [
+        "--image_repository",
+        "docker-pcapcore",
+        "--image_version",
+        "v0.1.1",
+        "--image_user",
+        "leukgen",
+        "--volumes",
+        "/tmp",
+        "/carlos",
+        "--optdir",
+        optdir.strpath,
+        "--bindir",
+        bindir.strpath,
+        "--tmpvar",
+        "$TMPDIR",
+        "--command",
+        "bwa_mem.pl",
+        "--target",
+        "bwa_mem.pl",
+    ]
+    result = runner.invoke(container_cli, args, catch_exceptions=False)
+    if result.exit_code:
+        print(vars(result))
+
+    for i in optexe.strpath, binexe.strpath:
+        assert b"4.2.1" in subprocess.check_output(
+            args=[i, "--version"],
+            env={"TMP": "/tmp", "USER": "root"},
+            stderr=subprocess.STDOUT,
+        )
+
+    assert "--volume /tmp:/carlos" if container_runtime == "docker" else "--bind /tmp:/carlos" in optexe.read()
+    assert "--workdir $TMP" in optexe.read()
+    assert not runner.invoke(container_cli, ["--help"]).exit_code
+
+
+@SKIP_DOCKER
+def test_register_docker(tmpdir):
+    """Sample test for register_docker command."""
+    run_register_container(tmpdir, container_runtime="docker")
+
+
+@SKIP_SINGULARITY
+def test_register_singularity(tmpdir):
+    """Sample test for register_singularity command."""
+    run_register_container(tmpdir, container_runtime="singularity")
 
 
 @SKIP_SINGULARITY
@@ -20,15 +80,15 @@ def test_register_toil(tmpdir):
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
     bindir = tmpdir.mkdir("bin")
-    optexe = optdir.join("toil_disambiguate", "v0.1.2", "toil_disambiguate")
-    binexe = bindir.join("toil_disambiguate_v0.1.2")
+    optexe = optdir.join("toil_container", "v2.0.3", "toil_container")
+    binexe = bindir.join("toil_container_v2.0.3")
     result = runner.invoke(
         cli.register_toil,
         [
             "--pypi_name",
-            "toil_disambiguate",
+            "toil_container",
             "--pypi_version",
-            "v0.1.2",
+            "v2.0.3",
             "--image_user",
             "leukgen",
             "--volumes",
@@ -40,6 +100,8 @@ def test_register_toil(tmpdir):
             bindir.strpath,
             "--tmpvar",
             "$TMP",
+            "--python",
+            "python3",
         ],
     )
 
@@ -56,74 +118,26 @@ def test_register_toil(tmpdir):
     assert not runner.invoke(cli.register_toil, ["--help"]).exit_code
 
 
-@SKIP_SINGULARITY
-def test_register_singularity(tmpdir):
-    """Sample test for register_singularity command."""
-    runner = CliRunner()
-    optdir = tmpdir.mkdir("opt")
-    bindir = tmpdir.mkdir("bin")
-    optexe = optdir.join("docker-pcapcore", "v0.1.1", "bwa_mem.pl")
-    binexe = bindir.join("bwa_mem.pl")
-    result = runner.invoke(
-        cli.register_singularity,
-        [
-            "--image_repository",
-            "docker-pcapcore",
-            "--image_version",
-            "v0.1.1",
-            "--image_user",
-            "leukgen",
-            "--volumes",
-            "/tmp",
-            "/carlos",
-            "--optdir",
-            optdir.strpath,
-            "--bindir",
-            bindir.strpath,
-            "--tmpvar",
-            "$TMP",
-            "--command",
-            "bwa_mem.pl",
-            "--target",
-            "bwa_mem.pl",
-        ],
-    )
-
-    if result.exit_code:
-        print(vars(result))
-
-    for i in optexe.strpath, binexe.strpath:
-        assert b"4.2.1" in subprocess.check_output(
-            args=[i, "--version"],
-            env={"TMP": "/tmp", "USER": "root"},
-            stderr=subprocess.STDOUT,
-        )
-
-    assert "--bind /tmp:/carlos" in optexe.read()
-    assert "--workdir $TMP" in optexe.read()
-    assert not runner.invoke(cli.register_singularity, ["--help"]).exit_code
-
-
 def test_register_python(tmpdir):
     """Sample test for register_python command."""
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
     bindir = tmpdir.mkdir("bin")
-    optexe = optdir.join("toil_snapigv", "v0.1.1", "toil_snapigv")
-    binexe = bindir.join("toil_snapigv_v0.1.1")
+    optexe = optdir.join("toil_container", "v2.0.3", "toil_container")
+    binexe = bindir.join("toil_container_v2.0.3")
     result = runner.invoke(
         cli.register_python,
         [
             "--pypi_name",
-            "toil_snapigv",
+            "toil_container",
             "--pypi_version",
-            "v0.1.1",
+            "v2.0.3",
             "--optdir",
             optdir.strpath,
             "--bindir",
             bindir.strpath,
             "--python",
-            "python2",
+            "python3",
         ],
     )
 
@@ -142,15 +156,15 @@ def test_register_python_github(tmpdir):
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
     bindir = tmpdir.mkdir("bin")
-    optexe = optdir.join("toil_snapigv", "v0.1.1", "toil_snapigv")
-    binexe = bindir.join("toil_snapigv_v0.1.1")
+    optexe = optdir.join("toil_container", "v2.0.3", "toil_container")
+    binexe = bindir.join("toil_container_v2.0.3")
     result = runner.invoke(
         cli.register_python,
         [
             "--pypi_name",
-            "toil_snapigv",
+            "toil_container",
             "--pypi_version",
-            "v0.1.1",
+            "v2.0.3",
             "--optdir",
             optdir.strpath,
             "--bindir",
@@ -158,7 +172,7 @@ def test_register_python_github(tmpdir):
             "--github_user",
             "papaemmelab",
             "--python",
-            "python2",
+            "python3",
         ],
     )
 
