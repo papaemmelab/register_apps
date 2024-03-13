@@ -48,7 +48,7 @@ VOLUMES = click.option(
     "--volumes",
     type=click.Tuple([click.Path(exists=True, resolve_path=True, dir_okay=True), str]),
     multiple=True,
-    default=get_default_volumes(),
+    default=get_default_volumes,
     show_default=False,
     help=f"volumes tuples to be passed to the container command. Use $REGISTER_APPS_VOLUMES. [default={get_default_volumes()}]",
 )
