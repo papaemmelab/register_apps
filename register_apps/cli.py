@@ -318,13 +318,9 @@ def register_python(pypi_name, pypi_version, github_user, bindir, optdir, python
         fg="green",
     )
 
-
 def _get_or_create_image(optdir, singularity, image_url):
     """Pull image if it's not locally available and store it."""
-    singularity_images = []
-    for i in ["*.sif", "*.simg"]:
-        singularity_images += list(optdir.glob(i))
-
+    singularity_images = list(optdir.glob("*.sif")) + list(optdir.glob("*.simg"))
     if len(singularity_images) > 1:
         click.echo(f"Found multiple images at {optdir}. Using {singularity_images[0]}.")
 
@@ -335,8 +331,8 @@ def _get_or_create_image(optdir, singularity, image_url):
             ["/bin/bash", "-c", f"umask 22 && {singularity} pull {image_url}"],
             cwd=optdir,
         )
-        singularity_images = glob(join(optdir, "*.sif")) + glob(join(optdir, "*.simg"))
-        assert len(singularity_images) < 1, f"Image not found: {optdir}"
+        singularity_images = list(optdir.glob("*.sif")) + list(optdir.glob("*.simg"))
+        assert singularity_images, f"Image not found: {optdir}"
 
     singularity_image = singularity_images[0]
     # fix singularity permissions

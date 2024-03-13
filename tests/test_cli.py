@@ -46,7 +46,7 @@ def run_register_container(tmpdir, container_runtime):
         "--target",
         "bwa_mem.pl",
     ]
-    result = runner.invoke(container_cli, args)
+    result = runner.invoke(container_cli, args, catch_exceptions=False)
     if result.exit_code:
         print(vars(result))
 
