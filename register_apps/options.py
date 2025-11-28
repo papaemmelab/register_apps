@@ -1,4 +1,5 @@
 """register_apps cli options."""
+
 import os
 import click
 from register_apps import __version__
@@ -7,7 +8,19 @@ from register_apps import __version__
 _DEFAULT_OPTDIR = "/work/isabl/local"
 _DEFAULT_BINDIR = "/work/isabl/bin"
 
+
 def get_default_volumes():
+    """
+    Get default volume mappings from environment variable or return default.
+
+    Reads REGISTER_APPS_VOLUMES environment variable and parses comma-separated
+    volume mappings. Each volume can be in format "src:dest" or just "src"
+    (which maps to itself).
+
+    Returns:
+        list: List of (source, destination) tuples for volume mappings.
+              Defaults to [("/data1", "/data1")] if no environment variable is set.
+    """
     volumes = []
     for vol in os.getenv("REGISTER_APPS_VOLUMES", "").split(","):
         if ":" in vol:
@@ -15,6 +28,7 @@ def get_default_volumes():
         else:
             volumes.append((vol, vol))
     return volumes or [("/data1", "/data1")]
+
 
 VERSION = click.version_option(version=__version__)
 
@@ -50,7 +64,10 @@ VOLUMES = click.option(
     multiple=True,
     default=get_default_volumes,
     show_default=False,
-    help=f"volumes tuples to be passed to the container command. Use $REGISTER_APPS_VOLUMES. [default={get_default_volumes()}]",
+    help=(
+        f"volumes tuples to be passed to the container command. "
+        f"Use $REGISTER_APPS_VOLUMES. [default={get_default_volumes()}]"
+    ),
 )
 TMPVAR = click.option(
     "--tmpvar",

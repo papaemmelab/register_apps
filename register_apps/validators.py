@@ -21,16 +21,16 @@ def validate_patterns_are_files(patterns, check_size=True):
         files = list(glob(pattern))
 
         if not files:
-            msg = "{} pattern matched no files.".format(pattern)
+            msg = f"{pattern} pattern matched no files."
             raise exceptions.ValidationError(msg)
 
         for i in files:
             if not os.path.isfile(i):
-                msg = "{} is not a file.".format(i)
+                msg = f"{i} is not a file."
                 raise exceptions.ValidationError(msg)
 
             if check_size and not os.path.getsize(i) > 0:
-                msg = "{} is an empty file.".format(i)
+                msg = f"{i} is an empty file."
                 raise exceptions.ValidationError(msg)
 
     return True
@@ -50,12 +50,12 @@ def validate_patterns_are_dirs(patterns):
         dirs = list(glob(pattern))
 
         if not dirs:
-            msg = "{} pattern matched no dirs.".format(pattern)
+            msg = f"{pattern} pattern matched no dirs."
             raise exceptions.ValidationError(msg)
 
         for i in dirs:
             if not os.path.isdir(i):
-                msg = "{} is not a directory.".format(i)
+                msg = f"{i} is not a directory."
                 raise exceptions.ValidationError(msg)
 
     return True

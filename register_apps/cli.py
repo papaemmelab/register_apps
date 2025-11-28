@@ -15,8 +15,6 @@ cause problems, the code will get executed twice:
 Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
 
-from glob import glob
-from os.path import join
 from pathlib import Path
 import os
 import shutil
@@ -26,6 +24,7 @@ import click
 
 from register_apps import options
 from register_apps import utils
+
 
 @click.command()
 @options.PYPI_NAME
@@ -42,7 +41,7 @@ from register_apps import utils
 @options.VIRTUALENVWRAPPER
 @options.CONTAINER
 @options.ENVIRONMENT
-def register_toil(
+def register_toil(  # pylint: disable=R0917
     pypi_name,
     pypi_version,
     bindir,
@@ -66,7 +65,6 @@ def register_toil(
     optexe = optdir / pypi_name
     binexe = bindir / f"{pypi_name}_{pypi_version}"
     workdir = f"{tmpvar}/{pypi_name}_{pypi_version}_`uuidgen`"
-    
     image_url = image_url or f"{image_user}/{pypi_name}:{pypi_version}"
     if container == "singularity" and not image_url.startswith("docker://"):
         image_url = f"docker://{image_url}"
@@ -106,7 +104,7 @@ def register_toil(
 
     click.echo(f"Installing package with '{install_cmd}'...")
     toolpath = subprocess.check_output(["/bin/bash", "-c", install_cmd])
-    toolpath = toolpath.decode("utf-8").strip().split("\n")[-1]
+    toolpath = toolpath.decode("utf-8").strip().rsplit("\n", maxsplit=1)[-1]
 
     # build command
     command = [
@@ -119,7 +117,7 @@ def register_toil(
             "--singularity",
             _get_or_create_image(optdir, singularity, image_url),
         ]
-    else: # container == "docker"
+    else:  # container == "docker"
         command += [
             "--docker",
             image_url,
@@ -142,7 +140,8 @@ def register_toil(
         fg="green",
     )
 
-def register_image(  # pylint: disable=R0913
+
+def register_image(  # pylint: disable=R0913,R0917
     bindir,
     command,
     force,
@@ -158,12 +157,37 @@ def register_image(  # pylint: disable=R0913
     tmpvar,
     volumes,
 ):
+    """
+    Register a container image (Docker or Singularity) as an executable.
+
+    Creates versioned executables that run commands inside container images.
+    The function sets up the directory structure, creates wrapper scripts,
+    and links executables in the bin directory.
+
+    Args:
+        bindir: Directory where executable symlinks will be created.
+        command: Command to execute inside the container.
+        force: If True, overwrite existing targets.
+        image_repository: Docker hub repository name.
+        image_type: Type of container ("docker" or "singularity").
+        image_url: Full image URL (optional, will be constructed if not provided).
+        image_user: Docker hub user/organization name.
+        image_version: Version tag of the image.
+        no_home: If True, use --no-home option for Singularity.
+        optdir: Directory where images and scripts will be stored.
+        runtime: Path to container runtime executable.
+        target: Name of the target executable to create.
+        tmpvar: Environment variable for work directory.
+        volumes: List of (source, destination) volume mappings.
+
+    Raises:
+        click.UsageError: If targets already exist and force is False.
+    """
     optdir = Path(optdir) / image_repository / image_version
     bindir = Path(bindir)
     optexe = optdir / target
     binexe = bindir / target
     workdir = f"{tmpvar}/${{USER}}_{image_repository}_{image_version}_`uuidgen`"
-    
     image_url = image_url or f"{image_user}/{image_repository}:{image_version}"
     if image_type == "singularity" and not image_url.startswith("docker://"):
         image_url = f"docker://{image_url}"
@@ -171,7 +195,9 @@ def register_image(  # pylint: disable=R0913
         image_url = image_url.replace("docker://", "")
 
     # do not overwrite targets
-    if not force and (os.path.isfile(optexe) or os.path.isfile(binexe)):  # pragma: no cover
+    if not force and (
+        os.path.isfile(optexe) or os.path.isfile(binexe)
+    ):  # pragma: no cover
         raise click.UsageError(f"Targets exist, exiting...\n\t{optexe}\n\t{binexe}")
 
     # make sure dirs exist
@@ -191,7 +217,7 @@ def register_image(  # pylint: disable=R0913
             command,
             '"$@"\n',
         ]
-    else: # image_type == "docker"
+    else:  # image_type == "docker"
         command = [
             runtime,
             "run",
@@ -210,7 +236,7 @@ def register_image(  # pylint: disable=R0913
 
     # link executables
     click.echo("Creating and linking executable...")
-    command = ' '.join(list(filter(None, command)))
+    command = " ".join(list(filter(None, command)))
     optexe.write_text(f"#!/bin/bash\n{command}")
     optexe.chmod(mode=0o755)
     utils.force_symlink(optexe, binexe)
@@ -270,7 +296,17 @@ def register_docker(docker, *args, **kwargs):
 @options.VERSION
 @options.VIRTUALENVWRAPPER
 @options.ENVIRONMENT
-def register_python(pypi_name, pypi_version, github_user, command, bindir, optdir, python, virtualenvwrapper, environment):
+def register_python(  # pylint: disable=R0917
+    pypi_name,
+    pypi_version,
+    github_user,
+    command,
+    bindir,
+    optdir,
+    python,
+    virtualenvwrapper,
+    environment,
+):
     """Register versioned python pipelines in a bin directory."""
     virtualenvwrapper = shutil.which(virtualenvwrapper)
     python = shutil.which(python)
@@ -312,7 +348,7 @@ def register_python(pypi_name, pypi_version, github_user, command, bindir, optdi
 
     click.echo(f"Installing package with '{install_cmd}'...")
     toolpath = subprocess.check_output(["/bin/bash", "-c", install_cmd])
-    toolpath = toolpath.decode("utf-8").strip().split("\n")[-1]
+    toolpath = toolpath.decode("utf-8").strip().rsplit("\n", maxsplit=1)[-1]
 
     # build command
     cmd = [toolpath, '"$@"', "\n"]
@@ -326,6 +362,7 @@ def register_python(pypi_name, pypi_version, github_user, command, bindir, optdi
         f"\nExecutables available at:\n" f"\n\t{str(optexe)}" f"\n\t{str(binexe)}\n",
         fg="green",
     )
+
 
 def _get_or_create_image(optdir, singularity, image_url):
     """Pull image if it's not locally available and store it."""
