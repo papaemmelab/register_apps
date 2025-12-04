@@ -3,30 +3,66 @@
 from os.path import join
 from os.path import abspath
 from os.path import dirname
-import json
 
 from setuptools import find_packages
 from setuptools import setup
 
 ROOT = abspath(dirname(__file__))
 
-# please put setup keywords in the setup.json to keep this file clean
-with open(join(ROOT, "setup.json"), "r") as f:
-    SETUP = json.load(f)
-
 # see 4 > https://packaging.python.org/guides/single-sourcing-package-version/
 with open(join(ROOT, "register_apps", "VERSION"), "r") as f:
     VERSION = f.read().strip()
 
 setup(
-    # single source package version
     version=VERSION,
-    # in combination with recursive-includes in MANIFEST.in, non-python files
-    # within the register_apps will be copied into the
-    # site-packages and wheels installation directories
     include_package_data=True,
-    # return a list all Python packages found within the ROOT directory
     packages=find_packages(),
-    # pass parameters loaded from setup.json including author and version
-    **SETUP,
+    classifiers=[
+        "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
+        "Operating System :: Unix",
+        "Operating System :: POSIX",
+        "Programming Language :: Python :: 3",
+        "Topic :: Utilities",
+    ],
+    entry_points={
+        "console_scripts": [
+            "register_docker=register_apps.cli:register_docker",
+            "register_python=register_apps.cli:register_python",
+            "register_singularity=register_apps.cli:register_singularity",
+            "register_toil=register_apps.cli:register_toil",
+            "register_apps=register_apps.cli:cli",
+        ]
+    },
+    setup_requires=[],
+    install_requires=[
+        "click>=7.0.0",
+        "pyyaml>=6.0",
+        "virtualenvwrapper>=4.8.4",
+    ],
+    extras_require={
+        "test": [
+            "coverage>=7.0.0",
+            "pydocstyle>=6.0.0",
+            "pytest>=7.0.0",
+            "pytest-cov>=4.0.0",
+            "pytest-env>=1.0.0",
+            "pylint>=3.0.0",
+            "setuptools<80",
+            "tox>=4.0.0",
+        ]
+    },
+    author="Juan S. Medina, Juan E. Arango Ossa",
+    keywords=[],
+    license="BSD",
+    name="register_apps",
+    test_suite="tests",
+    long_description="📘 learn more on `GitHub <https://github.com/papaemmelab/register_apps>`_!",
+    description=(
+        "👾 Register versioned toil container pipelines and other "
+        "commands in singularity containers and python packages."
+    ),
+    url="https://github.com/papaemmelab/register_apps",
 )

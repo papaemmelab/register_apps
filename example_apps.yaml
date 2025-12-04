@@ -1,0 +1,573 @@
+# Example YAML configuration for register_apps
+# This replaces the long bash script with a clean, maintainable YAML file
+
+# Global defaults - can be overridden per app
+
+defaults:
+  bindir: /isabl/bin
+  optdir: /isabl/local
+  container_runtime: docker
+  docker_path: docker
+  image_user: papaemmelab
+  volumes:
+    - /isabl:/isabl
+    - /work:/work
+  tmpvar: $TMP_DIR
+  environment: development
+  force: true
+  verify: "--version"
+  verify_after_install: false
+
+# List of apps to install
+apps:
+  # ============================================
+  # CONTAINER APPS
+  # ============================================
+
+  - type: container
+    target: mosdepth
+    command: mosdepth
+    image_repository: mosdepth
+    image_version: 0.2.5
+    image_url: quay.io/biocontainers/mosdepth:0.2.5--hb763d49_0
+
+  - type: container
+    target: fusioncatcher_v1.3.0
+    command: /opt/fusioncatcher/v1.30/bin/fusioncatcher.py
+    image_user: papaemmelab
+    image_repository: docker-fusioncatcher
+    image_version: v1.3.0
+
+  - type: container
+    target: STAR-Fusion
+    command: STAR-Fusion
+    image_user: papaemmelab
+    image_repository: docker-starfusion
+    image_version: v1.3.1
+
+  - type: container
+    target: fuseq
+    command: FuSeq
+    image_user: papaemmelab
+    image_repository: docker-fuseq
+    image_version: v1.1.1
+
+  - type: container
+    target: click_mergefusions_v1.0.7
+    command: click_mergefusions
+    image_user: papaemmelab
+    image_repository: click_mergefusions
+    image_version: v1.0.7
+
+  - type: container
+    target: HemeAutotator
+    command: Rscript
+    image_user: papaemmelab
+    image_repository: docker-heme-autotator
+    image_version: v0.2.0
+
+  - type: container
+    target: telseq_v0.0.2
+    command: telseq
+    image_repository: mosdepth
+    image_version: 0.2.5
+    image_url: quay.io/biocontainers/telseq:0.0.2--hdbb99b9_2
+
+  - type: container
+    target: svaba
+    command: svaba
+    image_repository: docker-svaba
+    image_version: v1.0.0
+
+  - type: container
+    target: gridss
+    command: sh /run.sh
+    image_user: papaemmelab
+    image_repository: docker-gridss
+    image_version: 2.2.2
+
+  - type: container
+    target: bwa_mem2.pl
+    command: bwa_mem.pl -bwamem2
+    image_repository: pcap-core
+    image_version: v5.5.0
+    image_url: docker://quay.io/wtsicgp/pcap-core:5.5.0
+
+  - type: container
+    target: picard
+    command: /usr/picard/docker_helper.sh
+    image_user: papaemmelab
+    image_repository: docker-picard
+    image_version: v1.1.0
+
+  - type: container
+    target: fastqc
+    command: fastqc
+    image_user: papaemmelab
+    image_repository: docker-fastqc
+    image_version: v1.0.1
+
+  - type: container
+    target: rna-seqc
+    command: rna-seqc
+    image_repository: rna-seqc
+    image_version: 1.1.8--2
+    image_url: docker://quay.io/biocontainers/rna-seqc:1.1.8--2
+
+  - type: container
+    target: salmon
+    command: salmon
+    image_repository: salmon
+    image_version: 0.10.0--1
+    image_url: docker://quay.io/biocontainers/salmon:0.10.0--1
+
+  - type: container
+    target: msisensor
+    command: /usr/local/bin/msisensor
+    image_user: dceoy
+    image_repository: msisensor
+    image_version: latest
+
+  - type: container
+    target: msisensor2
+    command: /usr/bin/msisensor2
+    image_user: hsun9
+    image_repository: msisensor2
+    image_version: latest
+
+  - type: container
+    target: docker-circos
+    command: ""
+    image_repository: docker-circos
+    image_version: 1.0.0
+
+  - type: container
+    target: click_plotcnsv
+    command: ""
+    image_repository: click_plotcnsv
+    image_version: v0.1.0
+
+  - type: container
+    target: docker-hrdtools
+    command: ""
+    image_repository: docker-hrdtools
+    image_version: v1.0.0
+
+  - type: container
+    target: click_clone
+    command: click_clone
+    image_user: papaemmelab
+    image_repository: click_clone
+    image_version: 0.2.0
+
+  - type: container
+    target: genomon_detectITD_v1.0.3
+    command: bash -c "$CMD"
+    image_user: rnlanger
+    image_repository: genomon_dependent
+    image_version: v0.1.3
+
+  - type: container
+    target: facets
+    command: Rscript /facets/run.R
+    image_user: papaemmelab
+    image_repository: docker-facets
+    image_version: v0.1.1
+
+  - type: container
+    target: facets_ch
+    command: Rscript /facets-ch/facets-ch.R
+    image_user: papaemmelab
+    image_repository: facets-ch
+    image_version: v0.1.0
+
+  - type: container
+    target: snp_pileup
+    command: snp-pileup
+    image_repository: facets-ch
+    image_version: v0.1.0
+
+  - type: container
+    target: cellranger
+    command: cellranger
+    image_user: papaemmelab
+    image_repository: cellranger
+    image_version: 3.1.0
+
+  - type: container
+    target: cellranger
+    command: cellranger
+    image_user: papaemmelab
+    image_repository: cellranger
+    image_version: v5.0.1
+
+  - type: container
+    target: cellranger
+    command: cellranger
+    image_user: papaemmelab
+    image_repository: cellranger
+    image_version: v6.0.1
+
+  - type: container
+    target: click_driverclone
+    command: click_driverclone
+    image_user: papaemmelab
+    image_repository: driverclone
+    image_version: v0.1.0
+
+  - type: container
+    target: jabba
+    command: ""
+    image_user: papaemmelab
+    image_repository: docker-jabba
+    image_version: v0.2.0
+
+  - type: container
+    target: vep
+    command: vep
+    image_user: ensemblorg
+    image_repository: ensembl-vep
+    image_version: release_93.7
+
+  - type: container
+    target: vep
+    command: vep
+    image_user: ensemblorg
+    image_repository: ensembl-vep
+    image_version: release_102.0
+
+  - type: container
+    target: AnnotateVcf.pl
+    command: AnnotateVcf.pl
+    image_user: papaemmelab
+    image_repository: docker-vagrent
+    image_version: v1.0.0
+
+  - type: container
+    target: lilac
+    command: lilac
+    image_user: papaemmelab
+    image_repository: docker-hmftools
+    image_version: v1.0.0
+
+  - type: container
+    target: arcasHLA
+    command: arcasHLA
+    image_user: papaemmelab
+    image_repository: arcashla
+    image_version: v0.5.0
+
+  - type: container
+    target: seq2hla
+    command: python /usr/local/bin/seq2HLA-master/seq2HLA.py
+    image_user: papaemmelab
+    image_repository: seq2hla
+    image_version: 2.2
+
+  - type: container
+    target: rna-seqc-1.1.8
+    command: rna-seqc
+    image_user: alexiswl
+    image_repository: rnaseqqc_1.1.8
+    image_version: latest
+
+  - type: container
+    target: ALLSorts
+    command: ALLSorts
+    image_user: papaemmelab
+    image_repository: allsorts
+    image_version: v0.1.0
+
+  - type: container
+    target: Allspice
+    command: Rscript
+    image_user: papaemmelab
+    image_repository: allspice-allcatchr
+    image_version: v0.1.0
+
+  - type: container
+    target: ALLCatchR
+    command: Rscript
+    image_user: papaemmelab
+    image_repository: allspice-allcatchr
+    image_version: v0.1.0
+
+  # Multiple tools from same image
+  - type: container
+    target: purple
+    command: purple
+    image_user: papaemmelab
+    image_repository: purple
+    image_version: v0.1.0
+
+  - type: container
+    target: amber
+    command: amber
+    image_user: papaemmelab
+    image_repository: purple
+    image_version: v0.1.0
+
+  - type: container
+    target: cobalt
+    command: cobalt
+    image_user: papaemmelab
+    image_repository: purple
+    image_version: v0.1.0
+
+  - type: container
+    target: rnacaller
+    command: perl /opt/rnacaller/bin/Flt3Itd.pl
+    image_user: papaemmelab
+    image_repository: rnacaller
+    image_version: v0.1.0
+
+  # ============================================
+  # TOIL APPS
+  # ============================================
+  - type: toil
+    pypi_name: toil_battenberg
+    pypi_version: v1.0.7
+    image_url: docker://papaemmelab/toil_battenberg:v1.0.7
+    github_user: papaemmelab
+    python: python2
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-3.25.0#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v1.1.8#eggs=toil_container
+
+  - type: toil
+    pypi_name: toil_brass
+    pypi_version: v1.0.2
+    image_url: docker://papaemmelab/toil_brass:v1.0.2
+    github_user: papaemmelab
+    python: python2
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-3.25.0#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v1.1.8#eggs=toil_container
+
+  - type: toil
+    pypi_name: toil_brass
+    pypi_version: v1.2.0
+    image_url: docker://papaemmelab/toil_brass:v1.2.0
+    github_user: papaemmelab
+    python: python2
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-3.25.0#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v1.1.8#eggs=toil_container
+
+  - type: toil
+    pypi_name: toil_unmatched_cnvkit
+    pypi_version: v1.0.0
+    image_url: docker://papaemmelab/toil_unmatched_cnvkit:v1.0.0
+    github_user: papaemmelab
+    python: python3
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-5.5.1#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v2.0.3#eggs=toil_container
+
+  - type: toil
+    pypi_name: toil_pindel
+    pypi_version: v1.2.0
+    image_url: docker://papaemmelab/toil_pindel:v1.2.0
+    github_user: papaemmelab
+    python: python3
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-5.5.1#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v2.0.3#eggs=toil_container
+
+  - type: toil
+    pypi_name: toil_disambiguate
+    pypi_version: v1.1.1
+    image_url: docker://papaemmelab/toil_disambiguate:v1.1.1
+    github_user: papaemmelab
+    python: python2
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-3.25.0#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v1.1.8#eggs=toil_container
+
+  - type: toil
+    pypi_name: toil_mutect
+    pypi_version: v1.2.10
+    image_url: docker://papaemmelab/toil_mutect:v1.2.10
+    github_user: papaemmelab
+    python: python3
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-5.5.1#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v2.0.3#eggs=toil_container
+
+  - type: toil
+    pypi_name: toil_mutect
+    pypi_version: v1.2.7
+    image_url: docker://papaemmelab/toil_mutect:v1.2.7
+    github_user: papaemmelab
+    python: python2
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-3.25.0#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v1.1.8#eggs=toil_container
+
+  - type: toil
+    pypi_name: toil_strelka
+    pypi_version: v1.0.9
+    image_url: docker://papaemmelab/toil_strelka:v1.0.9
+    github_user: papaemmelab
+    python: python3
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-5.5.1#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v2.0.3#eggs=toil_container
+
+  - type: toil
+    pypi_name: toil_conpair
+    pypi_version: v1.0.4
+    image_url: docker://papaemmelab/toil_conpair:v1.0.4
+    github_user: papaemmelab
+    python: python2
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-3.25.0#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v1.1.8#eggs=toil_container
+
+  - type: toil
+    pypi_name: toil_freebayes
+    pypi_version: v0.2.0
+    image_url: docker://papaemmelab/toil_freebayes:v0.2.0
+    python: python3
+    github_user: papaemmelab
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-5.5.1#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v2.0.3#eggs=toil_container
+
+  - type: toil
+    pypi_name: toil_mergevcfs
+    pypi_version: v0.12.0
+    image_url: docker://papaemmelab/toil_mergevcfs:v0.12.0
+    github_user: papaemmelab
+    python: python3
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-5.5.1#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v2.0.3#eggs=toil_container
+
+  - type: toil
+    pypi_name: toil_mergevcfs
+    pypi_version: v0.13.2
+    image_url: docker://papaemmelab/toil_mergevcfs:v0.13.2
+    github_user: papaemmelab
+    python: python3
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-5.5.1#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v2.0.3#eggs=toil_container
+
+  - type: toil
+    pypi_name: toil_cvflag
+    pypi_version: v0.3.0
+    image_url: docker://papaemmelab/toil_cvflag:v0.3.0
+    github_user: papaemmelab
+    python: python3
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-5.5.1#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v2.0.3#eggs=toil_container
+
+  - type: toil
+    pypi_name: toil_somalier
+    pypi_version: v0.1.0
+    image_url: docker://papaemmelab/toil_somalier:v0.1.0
+    github_user: papaemmelab
+    python: python3
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-5.5.1#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v2.0.3#eggs=toil_container
+
+  - type: toil
+    pypi_name: toil_ace
+    pypi_version: v1.0.2
+    image_url: docker://papaemmelab/toil_ace:v1.0.2
+    github_user: papaemmelab
+    python: python3
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-5.5.1#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v2.0.3#eggs=toil_container
+
+  # Special cases with pre-install steps
+  - type: toil
+    pypi_name: toil_caveman
+    pypi_version: v1.0.6
+    image_url: docker://papaemmelab/toil_caveman:v1.0.6
+    github_user: papaemmelab
+    python: python2
+    container: docker
+    pre_install:
+      - git+https://github.com/papaemmelab/toil@custom-3.25.0#eggs=toil
+      - git+https://github.com/papaemmelab/toil_container@v1.1.8#eggs=toil_container
+      - git+https://github.com/papaemmelab/toil_cvflag@v0.4.0#eggs=toil_cvflag
+
+  # - type: toil
+  #   pypi_name: toil_cnvkit
+  #   pypi_version: v1.0.0
+  #   image_url: docker://papaemmelab/toil_cnvkit:v1.0.0
+  #   github_user: papaemmelab
+  #   python: python2
+  #   container: docker
+  #   pre_install:
+  #     - numpy==1.9
+  #     - biopython==1.62
+
+  # ============================================
+  # PYTHON APPS
+  # ============================================
+
+  - type: python
+    pypi_name: click_annotsv
+    pypi_version: v1.0.1
+    github_user: papaemmelab
+    python: python3
+
+  - type: python
+    pypi_name: click_annotsv_unmatched
+    pypi_version: v1.2.0
+    github_user: papaemmelab
+    python: python3
+
+  - type: python
+    pypi_name: click_annotvcf
+    pypi_version: v1.0.9
+    github_user: papaemmelab
+    python: python3
+
+  - type: python
+    pypi_name: click_annotvcf
+    pypi_version: v1.2.2
+    github_user: papaemmelab
+    python: python3
+
+  - type: python
+    pypi_name: click_annotvcf
+    pypi_version: v1.3.1
+    github_user: papaemmelab
+    python: python3
+
+  - type: python
+    pypi_name: toil_hla
+    pypi_version: v1.0.0
+    github_user: papaemmelab
+    python: python3
+
+  # Note: click_wgspost and click_egreport are skipped in original script
+  # They can be added here when ready:
+  # - type: python
+  #   pypi_name: click_wgspost
+  #   pypi_version: v1.4.5
+  #   github_user: papaemmelab
+  #   python: python3

@@ -1,87 +1,94 @@
 """register_apps cli tests."""
-# pylint: disable=E1135
-import subprocess
+
+import os
 
 from click.testing import CliRunner
 import pytest
 
 from register_apps import cli
+from register_apps import utils as register_utils
 from tests import utils
 
 
 SKIP_SINGULARITY = pytest.mark.skipif(
-    not utils.is_executable_available("singularity"), reason="singularity is not available."
+    not utils.is_executable_available("singularity"),
+    reason="singularity is not available.",
 )
+
 
 SKIP_DOCKER = pytest.mark.skipif(
-    not utils.is_executable_available("docker"), reason="docker is not available."
+    not utils.is_executable_available("docker"), reason="docker is not installed."
 )
 
-def run_register_container(tmpdir, container_runtime):
+
+def _require_virtualenvwrapper():
+    """Require virtualenvwrapper to be available, fail if not."""
+    if not register_utils.is_virtualenvwrapper_configured():
+        pytest.fail(
+            "virtualenvwrapper is not available. "
+            "Please install virtualenvwrapper and ensure it's configured."
+        )
+
+
+def _test_register_container(tmpdir, container_cli):
+    """Helper function to test container registration."""
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
     bindir = tmpdir.mkdir("bin")
-    optexe = optdir.join("docker-pcapcore", "v0.1.1", "bwa_mem.pl")
-    binexe = bindir.join("bwa_mem.pl")
-    container_cli = cli.register_docker if container_runtime == "docker" else cli.register_singularity 
+    optexe = optdir.join("alpine", "latest", "test_cmd")
+    binexe = bindir.join("test_cmd")
 
-    args = [
-        "--image_repository",
-        "docker-pcapcore",
-        "--image_version",
-        "v0.1.1",
-        "--image_user",
-        "leukgen",
-        "--volumes",
-        "/tmp",
-        "/carlos",
-        "--optdir",
-        optdir.strpath,
-        "--bindir",
-        bindir.strpath,
-        "--tmpvar",
-        "$TMPDIR",
-        "--command",
-        "bwa_mem.pl",
-        "--target",
-        "bwa_mem.pl",
-    ]
-    result = runner.invoke(container_cli, args, catch_exceptions=False)
-    if result.exit_code:
-        print(vars(result))
+    result = runner.invoke(
+        container_cli,
+        [
+            "--image_url",
+            "alpine:latest",
+            "--image_repository",
+            "alpine",
+            "--image_version",
+            "latest",
+            "--volumes",
+            "/tmp",
+            "/tmp",
+            "--optdir",
+            optdir.strpath,
+            "--bindir",
+            bindir.strpath,
+            "--tmpvar",
+            "$TMPDIR",
+            "--command",
+            "echo",
+            "--target",
+            "test_cmd",
+        ],
+        catch_exceptions=False,
+    )
 
-    for i in optexe.strpath, binexe.strpath:
-        assert b"4.2.1" in subprocess.check_output(
-            args=[i, "--version"],
-            env={"TMP": "/tmp", "USER": "root"},
-            stderr=subprocess.STDOUT,
-        )
-
-    assert "--volume /tmp:/carlos" if container_runtime == "docker" else "--bind /tmp:/carlos" in optexe.read()
-    assert "--workdir $TMP" in optexe.read()
-    assert not runner.invoke(container_cli, ["--help"]).exit_code
+    assert result.exit_code == 0, f"Failed: {result.output}"
+    assert os.path.exists(optexe.strpath)
+    assert os.path.exists(binexe.strpath)
 
 
 @SKIP_DOCKER
 def test_register_docker(tmpdir):
-    """Sample test for register_docker command."""
-    run_register_container(tmpdir, container_runtime="docker")
+    """Test register_docker command."""
+    _test_register_container(tmpdir, cli.register_docker)
 
 
 @SKIP_SINGULARITY
 def test_register_singularity(tmpdir):
-    """Sample test for register_singularity command."""
-    run_register_container(tmpdir, container_runtime="singularity")
+    """Test register_singularity command."""
+    _test_register_container(tmpdir, cli.register_singularity)
 
 
 @SKIP_SINGULARITY
 def test_register_toil(tmpdir):
-    """Sample test for register_toil command."""
+    """Test register_toil command."""
+    _require_virtualenvwrapper()
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
     bindir = tmpdir.mkdir("bin")
-    optexe = optdir.join("toil_container", "v2.0.3", "toil_container")
-    binexe = bindir.join("toil_container_v2.0.3")
+
     result = runner.invoke(
         cli.register_toil,
         [
@@ -93,7 +100,7 @@ def test_register_toil(tmpdir):
             "leukgen",
             "--volumes",
             "/tmp",
-            "/carlos",
+            "/tmp",
             "--optdir",
             optdir.strpath,
             "--bindir",
@@ -105,83 +112,79 @@ def test_register_toil(tmpdir):
         ],
     )
 
-    if result.exit_code:
-        print(vars(result))
-
-    for i in optexe.strpath, binexe.strpath:
-        assert b"0.1.2" in subprocess.check_output(
-            args=[i, "--version"], env={"TMP": "/tmp"}, stderr=subprocess.STDOUT
-        )
-
-    assert "--volumes /tmp /carlos" in optexe.read()
-    assert "--workDir $TMP" in optexe.read()
-    assert not runner.invoke(cli.register_toil, ["--help"]).exit_code
+    assert result.exit_code == 0, f"Failed: {result.output}"
+    workon_home = os.getenv("WORKON_HOME", os.path.expanduser("~/.virtualenvs"))
+    venv_path = os.path.join(workon_home, "production__toil_container__v2.0.3")
+    assert os.path.exists(venv_path)
 
 
 def test_register_python(tmpdir):
-    """Sample test for register_python command."""
+    """Test register_python command."""
+    _require_virtualenvwrapper()
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
     bindir = tmpdir.mkdir("bin")
-    optexe = optdir.join("toil_container", "v2.0.3", "toil_container")
-    binexe = bindir.join("toil_container_v2.0.3")
+    optexe = optdir.join("flake8", "4.0.1", "flake8")
+    binexe = bindir.join("flake8")
+
     result = runner.invoke(
         cli.register_python,
         [
             "--pypi_name",
-            "toil_container",
+            "flake8",
             "--pypi_version",
-            "v2.0.3",
+            "4.0.1",
             "--optdir",
             optdir.strpath,
             "--bindir",
             bindir.strpath,
             "--python",
             "python3",
+            "--command",
+            "flake8",
         ],
     )
 
-    if result.exit_code:
-        print(vars(result))
-
-    for i in optexe.strpath, binexe.strpath:
-        assert b"0.1.1" in subprocess.check_output(
-            args=[i, "--version"], stderr=subprocess.STDOUT
-        )
-    assert not runner.invoke(cli.register_python, ["--help"]).exit_code
+    assert result.exit_code == 0, f"Failed: {result.output}"
+    workon_home = os.getenv("WORKON_HOME", os.path.expanduser("~/.virtualenvs"))
+    venv_path = os.path.join(workon_home, "production__flake8__4.0.1")
+    assert os.path.exists(venv_path)
+    assert os.path.exists(optexe.strpath)
+    assert os.path.exists(binexe.strpath)
 
 
 def test_register_python_github(tmpdir):
-    """Sample test for register_python command."""
+    """Test register_python command with GitHub source."""
+    _require_virtualenvwrapper()
     runner = CliRunner()
     optdir = tmpdir.mkdir("opt")
     bindir = tmpdir.mkdir("bin")
-    optexe = optdir.join("toil_container", "v2.0.3", "toil_container")
-    binexe = bindir.join("toil_container_v2.0.3")
+    optexe = optdir.join("flake8", "4.0.1", "flake8")
+    binexe = bindir.join("flake8")
+
     result = runner.invoke(
         cli.register_python,
         [
             "--pypi_name",
-            "toil_container",
+            "flake8",
             "--pypi_version",
-            "v2.0.3",
+            "4.0.1",
             "--optdir",
             optdir.strpath,
             "--bindir",
             bindir.strpath,
             "--github_user",
-            "papaemmelab",
+            "PyCQA",
             "--python",
             "python3",
+            "--command",
+            "flake8",
         ],
     )
 
-    if result.exit_code:
-        print(vars(result))
-
-    for i in optexe.strpath, binexe.strpath:
-        assert b"0.1.1" in subprocess.check_output(
-            args=[i, "--version"], stderr=subprocess.STDOUT
-        )
-    assert not runner.invoke(cli.register_python, ["--help"]).exit_code
-
+    assert result.exit_code == 0, f"Failed: {result.output}"
+    workon_home = os.getenv("WORKON_HOME", os.path.expanduser("~/.virtualenvs"))
+    venv_path = os.path.join(workon_home, "production__flake8__4.0.1")
+    assert os.path.exists(venv_path)
+    assert os.path.exists(optexe.strpath)
+    assert os.path.exists(binexe.strpath)

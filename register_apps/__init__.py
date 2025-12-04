@@ -1,13 +1,9 @@
 """register_apps module."""
 
-from os.path import abspath
-from os.path import dirname
-from os.path import join
+from pathlib import Path
 
 # make sure we use absolute paths
-ROOT = abspath(dirname(__file__))
+ROOT = Path(__file__).resolve().parent
 
-with open(join(ROOT, "VERSION"), "r") as f:
-    VERSION = f.read().strip()
-
-__version__ = VERSION
+VERSION_FILE = ROOT / "VERSION"
+__version__ = VERSION_FILE.read_text(encoding="utf-8").strip()
